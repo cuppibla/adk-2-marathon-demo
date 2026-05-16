@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "marathon",
+      "runtimeExecutable": "uv",
+      "runtimeArgs": ["run", "python", "server.py"],
+      "port": 8000
+    }
+  ]
+}

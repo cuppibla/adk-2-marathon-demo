@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Marathon Strategy — ADK 2.0 Graph Demo</title>
+<style>
+  :root {
+    --text:        #14213d;
+    --text-soft:   #3e4a66;
+    --text-faint:  #6a7591;
+
+    --accent:      #4f8fec;
+    --active:      #2da9ec;
+    --complete:    #36b886;
+    --warn:        #d97a4a;
+
+    --glass-bg:    rgba(255, 255, 255, 0.62);
+    --glass-bg-2:  rgba(255, 255, 255, 0.78);
+    --glass-stroke: rgba(60, 95, 135, 0.16);
+    --glass-stroke-2: rgba(60, 95, 135, 0.22);
+
+    --hairline: rgba(28, 37, 56, 0.10);
+    --hairline-2: rgba(28, 37, 56, 0.18);
+
+    --spring: cubic-bezier(.34, 1.4, .64, 1);
+    --ease:   cubic-bezier(.4, 0, .2, 1);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  body {
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(ellipse 65% 55% at 10% 5%,   rgba(195, 220, 245, 0.40), transparent 65%),
+      radial-gradient(ellipse 55% 50% at 95% 95%,  rgba(200, 232, 218, 0.40), transparent 65%),
+      #f9fbfd;
+    background-attachment: fixed;
+    background-size: cover;
+  }
+
+  /* ─── Glass utility ────────────────────────────────────────────────────── */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(36px) saturate(170%);
+    -webkit-backdrop-filter: blur(36px) saturate(170%);
+    border: 1px solid var(--glass-stroke);
+    border-radius: 22px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      0 14px 40px -10px rgba(60, 95, 135, 0.22),
+      0 2px 6px -2px rgba(60, 95, 135, 0.10);
+  }
+  .glass-strong {
+    background: var(--glass-bg-2);
+    backdrop-filter: blur(44px) saturate(180%);
+    -webkit-backdrop-filter: blur(44px) saturate(180%);
+    border: 1px solid var(--glass-stroke-2);
+    border-radius: 26px;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      0 20px 56px -10px rgba(60, 95, 135, 0.28),
+      0 4px 12px -4px rgba(60, 95, 135, 0.14);
+  }
+
+  /* ─── Header (floating glass bar) ──────────────────────────────────────── */
+  header {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    z-index: 10;
+    padding: 10px 14px 10px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    white-space: nowrap;
+  }
+  header .brand {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+    min-width: 0;
+    flex-shrink: 0;
+  }
+  header .brand .title {
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+    white-space: nowrap;
+  }
+  header .brand .sub {
+    font-size: 10.5px;
+    color: var(--text-faint);
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  header .spacer { flex: 1; min-width: 8px; }
+
+  .pill-group {
+    display: flex;
+    gap: 4px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+  .pill-btn {
+    background: transparent;
+    color: var(--text-soft);
+    border: 0;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: all 0.25s var(--ease);
+    white-space: nowrap;
+  }
+  .pill-btn:hover { color: var(--text); }
+  .pill-btn.selected {
+    background: white;
+    color: var(--text);
+    font-weight: 600;
+    box-shadow:
+      0 1px 3px rgba(60, 95, 135, 0.18),
+      0 4px 10px -2px rgba(60, 95, 135, 0.22);
+  }
+
+  .toggle-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: rgba(255, 255, 255, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 999px;
+    white-space: nowrap;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+  .toggle-group label {
+    color: var(--text-faint);
+    font-size: 10px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .toggle-group select {
+    background: transparent;
+    color: var(--text);
+    border: 0;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    appearance: none;
+    padding-right: 4px;
+  }
+  .toggle-group select:focus { outline: none; }
+
+  .action-btn {
+    background: linear-gradient(180deg, #8fdec0 0%, #5fc6ad 100%);
+    color: #084033;
+    border: 0;
+    padding: 8px 18px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      0 6px 14px -4px rgba(95, 198, 173, 0.45),
+      0 1px 2px rgba(95, 198, 173, 0.2);
+    transition: all 0.25s var(--spring);
+  }
+  .action-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      0 10px 20px -4px rgba(95, 198, 173, 0.5),
+      0 1px 2px rgba(95, 198, 173, 0.2);
+  }
+  .action-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .action-btn.replay {
+    background: white;
+    color: var(--text);
+    border: 1px solid var(--hairline-2);
+    box-shadow:
+      0 1px 2px rgba(80, 120, 180, 0.08),
+      0 4px 10px -2px rgba(80, 120, 180, 0.12);
+  }
+  .action-btn.replay:hover:not(:disabled) {
+    background: white;
+    box-shadow:
+      0 2px 4px rgba(80, 120, 180, 0.12),
+      0 6px 14px -2px rgba(80, 120, 180, 0.18);
+  }
+
+  /* ─── Main layout ──────────────────────────────────────────────────────── */
+  main {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 14px;
+    padding: 76px 12px 12px;
+    height: 100vh;
+  }
+  .graph-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 8px;
+  }
+  .graph-panel svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+  }
+  .results-panel {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .results-panel::-webkit-scrollbar { width: 6px; }
+  .results-panel::-webkit-scrollbar-track { background: transparent; }
+  .results-panel::-webkit-scrollbar-thumb { background: rgba(28,37,56,0.12); border-radius: 3px; }
+
+  /* ─── SVG nodes (glass-styled) ─────────────────────────────────────────── */
+  .node rect, .node polygon, .node-start circle {
+    fill: url(#node-fill);
+    stroke: rgba(70, 95, 135, 0.42);
+    stroke-width: 1.2;
+    filter: url(#shadow-soft);
+    transition: all 0.4s var(--spring);
+  }
+  .node text {
+    fill: var(--text);
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 600;
+    transition: fill 0.3s var(--ease);
+    pointer-events: none;
+  }
+  .node text.sub {
+    font-size: 10.5px;
+    fill: var(--text-soft);
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+  .node text.timer {
+    font-size: 11px;
+    fill: var(--active);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    opacity: 0;
+  }
+  .node.active text.timer { opacity: 1; }
+  .node.active text.sub { opacity: 0; }
+
+  .node.active rect, .node.active polygon, .node.active circle {
+    fill: url(#node-fill-active);
+    stroke: var(--active);
+    stroke-width: 1.8;
+    filter: url(#glow-active);
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  .node.active text { fill: #0a5a8c; }
+
+  .node.complete rect, .node.complete polygon, .node.complete circle {
+    fill: url(#node-fill-complete);
+    stroke: var(--complete);
+    stroke-width: 1.5;
+    filter: url(#glow-complete);
+  }
+  .node.complete text { fill: #1a6e4d; }
+
+  .node.skipped rect, .node.skipped polygon, .node.skipped circle {
+    opacity: 0.32;
+  }
+  .node.skipped text { opacity: 0.32; }
+
+  @keyframes pulse {
+    0%, 100% { stroke-width: 1.5; }
+    50%      { stroke-width: 2.5; }
+  }
+
+  /* SVG edges */
+  .edge {
+    fill: none;
+    stroke: rgba(70, 95, 135, 0.50);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    transition: all 0.4s var(--ease);
+  }
+  .edge.active {
+    stroke: var(--active);
+    stroke-width: 2;
+    stroke-dasharray: 4 4;
+    animation: flow 0.8s linear infinite;
+    filter: url(#glow-active);
+  }
+  .edge.complete {
+    stroke: var(--complete);
+    stroke-width: 1.8;
+    opacity: 0.7;
+  }
+  .edge.skipped { opacity: 0.08; }
+  @keyframes flow { to { stroke-dashoffset: -16; } }
+
+  .edge-label {
+    fill: var(--text-soft);
+    font-size: 11px;
+    font-family: inherit;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  /* ─── Right panel cards ─────────────────────────────────────────────── */
+  .card {
+    padding: 20px 22px;
+  }
+  .card h2 {
+    margin: 0 0 12px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-faint);
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+  }
+
+  /* Event log */
+  .event-log {
+    max-height: 160px;
+    overflow-y: auto;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+  }
+  .event-log .row {
+    display: grid;
+    grid-template-columns: 56px 150px 1fr;
+    gap: 12px;
+    padding: 6px 0;
+    align-items: center;
+    color: var(--text);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .event-log .row:last-child { border-bottom: 0; }
+  .event-log .ts { color: var(--text-soft); font-size: 11.5px; font-weight: 500; }
+  .event-log .node-name { color: #1c5cba; font-weight: 600; }
+  .event-log .preview { color: var(--text-soft); font-size: 11.5px; }
+  .event-log .placeholder {
+    text-align: center;
+    color: var(--text-faint);
+    padding: 24px 0;
+    font-style: italic;
+    font-size: 12px;
+  }
+
+  /* Strategy hero */
+  .strategy-hero {
+    padding: 28px 26px 24px;
+  }
+  .strategy-hero .scenario-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(79, 143, 236, 0.14);
+    color: #1c5cba;
+    border: 1px solid rgba(79, 143, 236, 0.35);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .strategy-hero .scenario-pill .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .strategy-hero .target-finish {
+    margin: 0 0 22px;
+    font-size: 28px;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.6px;
+    color: var(--text);
+  }
+  .strategy-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .strategy-field .label {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+  }
+  .strategy-field .value {
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .strategy-field.warning {
+    padding: 12px 14px;
+    background: rgba(236, 148, 104, 0.08);
+    border: 1px solid rgba(236, 148, 104, 0.22);
+    border-radius: 14px;
+  }
+  .strategy-field.warning .label { color: var(--warn); }
+  .strategy-field.warning .value { color: #b8632d; }
+
+  /* Stats card */
+  .stats-card {
+    padding: 22px 26px;
+    background:
+      linear-gradient(135deg, rgba(126, 229, 193, 0.22), rgba(168, 213, 255, 0.18));
+    border: 1px solid rgba(54, 184, 134, 0.45);
+  }
+  .stats-card h2 {
+    color: #1a6e4d;
+    margin-bottom: 14px;
+  }
+  .stats-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .stats-grid .stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-variant-numeric: tabular-nums;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(28, 37, 56, 0.05);
+  }
+  .stats-grid .stat:last-child { border-bottom: 0; }
+  .stats-grid .stat.highlight .value { color: #1a6e4d; }
+  .stats-grid .stat .label {
+    color: var(--text-faint);
+    font-size: 11.5px;
+    letter-spacing: 0.2px;
+  }
+  .stats-grid .stat .value {
+    color: var(--text);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .stats-grid .stat.highlight .value { color: var(--complete); }
+
+  /* Empty state placeholder */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-faint);
+    font-size: 13px;
+    text-align: center;
+    padding: 40px 24px;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<header class="glass">
+  <div class="brand">
+    <span class="title">Marathon Race Strategy</span>
+    <span class="sub">ADK 2.0 graph workflow demo</span>
+  </div>
+
+  <span class="spacer"></span>
+
+  <div class="pill-group" role="tablist" aria-label="Scenario">
+    <button class="pill-btn selected" data-scenario="HOT">Hot · Boston</button>
+    <button class="pill-btn" data-scenario="NORMAL">Normal · Berlin</button>
+    <button class="pill-btn" data-scenario="COLD">Cold · Chicago</button>
+  </div>
+
+  <div class="toggle-group">
+    <label for="slowmo">Speed</label>
+    <select id="slowmo">
+      <option value="1">1×</option>
+      <option value="1.5">1.5× slow</option>
+      <option value="2">2× slow</option>
+      <option value="3">3× slow</option>
+    </select>
+  </div>
+
+  <button class="action-btn replay" id="replay" disabled>↻ Replay</button>
+  <button class="action-btn" id="run">Run ▶</button>
+</header>
+
+<main>
+  <div class="graph-panel">
+    <svg id="graph" viewBox="0 0 800 720" width="100%">
+      <!-- Reusable defs: gradients + glow filters -->
+      <defs>
+        <linearGradient id="node-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="rgba(255,255,255,1)"/>
+          <stop offset="100%" stop-color="rgba(245,249,255,0.92)"/>
+        </linearGradient>
+        <linearGradient id="node-fill-active" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="rgba(155,215,250,0.95)"/>
+          <stop offset="100%" stop-color="rgba(195,230,250,0.92)"/>
+        </linearGradient>
+        <linearGradient id="node-fill-complete" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"  stop-color="rgba(170,225,200,0.95)"/>
+          <stop offset="100%" stop-color="rgba(200,235,215,0.92)"/>
+        </linearGradient>
+
+        <filter id="shadow-soft" x="-20%" y="-20%" width="140%" height="160%">
+          <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#3a5078" flood-opacity="0.18"/>
+        </filter>
+        <filter id="glow-active" x="-40%" y="-40%" width="180%" height="180%">
+          <feDropShadow dx="0" dy="0" stdDeviation="6" flood-color="#5ec0ff" flood-opacity="0.55"/>
+        </filter>
+        <filter id="glow-complete" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#5dc99c" flood-opacity="0.4"/>
+        </filter>
+      </defs>
+
+      <!-- Edges -->
+      <g id="edges">
+        <path class="edge" id="e-START-fetch_weather"   d="M 400 80 C 400 110, 200 110, 200 140"/>
+        <path class="edge" id="e-START-analyze_course"  d="M 400 80 L 400 140"/>
+        <path class="edge" id="e-START-pull_fitness"    d="M 400 80 C 400 110, 600 110, 600 140"/>
+        <path class="edge" id="e-fetch_weather-join_inputs"  d="M 200 200 C 200 240, 400 240, 400 270"/>
+        <path class="edge" id="e-analyze_course-join_inputs" d="M 400 200 L 400 270"/>
+        <path class="edge" id="e-pull_fitness-join_inputs"   d="M 600 200 C 600 240, 400 240, 400 270"/>
+        <path class="edge" id="e-join_inputs-route_by_weather" d="M 400 330 L 400 380"/>
+        <path class="edge" id="e-route_by_weather-hot_strategy"    d="M 400 440 C 400 480, 200 480, 200 510"/>
+        <path class="edge" id="e-route_by_weather-normal_strategy" d="M 400 440 L 400 510"/>
+        <path class="edge" id="e-route_by_weather-cold_strategy"   d="M 400 440 C 400 480, 600 480, 600 510"/>
+      </g>
+
+      <!-- Nodes -->
+      <g class="node node-start" id="node-START">
+        <circle cx="400" cy="60" r="22"/>
+        <text x="400" y="64" text-anchor="middle" style="font-size: 11px; font-weight: 600; letter-spacing: 1px;">START</text>
+      </g>
+
+      <g class="node" id="node-fetch_weather">
+        <rect x="100" y="140" width="200" height="60" rx="14"/>
+        <text x="200" y="170" text-anchor="middle">fetch_weather</text>
+        <text x="200" y="187" text-anchor="middle" class="sub">FunctionNode · 1.5s</text>
+        <text x="200" y="187" text-anchor="middle" class="timer" data-base="1.5">0.0s</text>
+      </g>
+
+      <g class="node" id="node-analyze_course">
+        <rect x="300" y="140" width="200" height="60" rx="14"/>
+        <text x="400" y="170" text-anchor="middle">analyze_course</text>
+        <text x="400" y="187" text-anchor="middle" class="sub">FunctionNode · 2.0s</text>
+        <text x="400" y="187" text-anchor="middle" class="timer" data-base="2.0">0.0s</text>
+      </g>
+
+      <g class="node" id="node-pull_fitness">
+        <rect x="500" y="140" width="200" height="60" rx="14"/>
+        <text x="600" y="170" text-anchor="middle">pull_fitness</text>
+        <text x="600" y="187" text-anchor="middle" class="sub">FunctionNode · 1.0s</text>
+        <text x="600" y="187" text-anchor="middle" class="timer" data-base="1.0">0.0s</text>
+      </g>
+
+      <g class="node" id="node-join_inputs">
+        <rect x="320" y="270" width="160" height="60" rx="14"/>
+        <text x="400" y="295" text-anchor="middle">join_inputs</text>
+        <text x="400" y="314" text-anchor="middle" class="sub">JoinNode</text>
+      </g>
+
+      <g class="node" id="node-route_by_weather">
+        <polygon points="400,376 484,410 400,444 316,410"/>
+        <text x="400" y="408" text-anchor="middle">router</text>
+        <text x="400" y="424" text-anchor="middle" class="sub">if temp ≥ 70</text>
+      </g>
+
+      <g class="node" id="node-hot_strategy">
+        <rect x="100" y="510" width="200" height="60" rx="14"/>
+        <text x="200" y="540" text-anchor="middle">hot_strategy</text>
+        <text x="200" y="557" text-anchor="middle" class="sub">Agent · gemini-flash</text>
+      </g>
+
+      <g class="node" id="node-normal_strategy">
+        <rect x="300" y="510" width="200" height="60" rx="14"/>
+        <text x="400" y="540" text-anchor="middle">normal_strategy</text>
+        <text x="400" y="557" text-anchor="middle" class="sub">Agent · gemini-flash</text>
+      </g>
+
+      <g class="node" id="node-cold_strategy">
+        <rect x="500" y="510" width="200" height="60" rx="14"/>
+        <text x="600" y="540" text-anchor="middle">cold_strategy</text>
+        <text x="600" y="557" text-anchor="middle" class="sub">Agent · gemini-flash</text>
+      </g>
+
+      <text class="edge-label" x="216" y="500" text-anchor="middle">"HOT"</text>
+      <text class="edge-label" x="420" y="475" text-anchor="middle">"NORMAL"</text>
+      <text class="edge-label" x="586" y="500" text-anchor="middle">"COLD"</text>
+    </svg>
+  </div>
+
+  <div class="results-panel">
+    <div class="card glass">
+      <h2>Live event stream</h2>
+      <div class="event-log" id="event-log">
+        <div class="placeholder">Pick a scenario and tap Run to start.</div>
+      </div>
+    </div>
+
+    <div id="strategy-output">
+      <div class="card glass empty-state">
+        Race strategy will appear here once the workflow completes.
+      </div>
+    </div>
+
+    <div id="stats-output"></div>
+  </div>
+</main>
+
+<script>
+  // ─── Graph dependency model ───────────────────────────────────────────────
+  const PARENTS = {
+    'fetch_weather':    ['START'],
+    'analyze_course':   ['START'],
+    'pull_fitness':     ['START'],
+    'join_inputs':      ['fetch_weather', 'analyze_course', 'pull_fitness'],
+    'route_by_weather': ['join_inputs'],
+    'hot_strategy':     ['route_by_weather'],
+    'normal_strategy':  ['route_by_weather'],
+    'cold_strategy':    ['route_by_weather'],
+  };
+  const STRATEGY_NODES = ['hot_strategy', 'normal_strategy', 'cold_strategy'];
+  const FETCH_NODES    = ['fetch_weather', 'analyze_course', 'pull_fitness'];
+  const SCENARIO_LABEL = { HOT: 'Hot · Boston', NORMAL: 'Normal · Berlin', COLD: 'Cold · Chicago' };
+
+  // ─── State ────────────────────────────────────────────────────────────────
+  let selectedScenario = 'HOT';
+  let slowMo = 1;
+  let activeStream = null;
+  let nodeState = {};
+  const completed = new Set();
+  const timers = {};            // node → setInterval id
+  const nodeStartTimes = {};    // node → ms timestamp when it became active
+  const cachedRuns = {};        // scenario → {events: [...], totalTime, llmCalls}
+  let recordingEvents = null;
+  let recordingT0 = 0;
+
+  // ─── DOM helpers ──────────────────────────────────────────────────────────
+  function setNodeState(node, state) {
+    nodeState[node] = state;
+    const el = document.getElementById('node-' + node);
+    if (!el) return;
+    el.classList.remove('active', 'complete', 'skipped');
+    if (state === 'active') {
+      el.classList.add('active');
+      startNodeTimer(node);
+    } else if (state === 'complete') {
+      el.classList.add('complete');
+      stopNodeTimer(node);
+    } else if (state === 'skipped') {
+      el.classList.add('skipped');
+      stopNodeTimer(node);
+    } else {
+      stopNodeTimer(node);
+    }
+  }
+
+  function startNodeTimer(node) {
+    if (timers[node]) clearInterval(timers[node]);
+    nodeStartTimes[node] = performance.now();
+    const el = document.querySelector(`#node-${node} .timer`);
+    if (!el) return;
+    el.textContent = '0.0s';
+    timers[node] = setInterval(() => {
+      const elapsed = (performance.now() - nodeStartTimes[node]) / 1000;
+      el.textContent = elapsed.toFixed(1) + 's';
+    }, 80);
+  }
+  function stopNodeTimer(node) {
+    if (timers[node]) {
+      clearInterval(timers[node]);
+      delete timers[node];
+    }
+  }
+
+  function setEdgeState(from, to, state) {
+    const el = document.getElementById(`e-${from}-${to}`);
+    if (!el) return;
+    el.classList.remove('active', 'complete', 'skipped');
+    if (state) el.classList.add(state);
+  }
+
+  function activateNode(node) {
+    setNodeState(node, 'active');
+    for (const parent of PARENTS[node] || []) {
+      setEdgeState(parent, node, 'active');
+    }
+  }
+
+  function completeNode(node) {
+    setNodeState(node, 'complete');
+    completed.add(node);
+    for (const parent of PARENTS[node] || []) {
+      setEdgeState(parent, node, 'complete');
+    }
+    for (const [child, parents] of Object.entries(PARENTS)) {
+      if (completed.has(child) || nodeState[child] === 'active') continue;
+      if (parents.every(p => p === 'START' || completed.has(p))) {
+        activateNode(child);
+      }
+    }
+  }
+
+  function skipUnchosenStrategies(chosen) {
+    for (const node of STRATEGY_NODES) {
+      if (node === chosen) continue;
+      setNodeState(node, 'skipped');
+      setEdgeState('route_by_weather', node, 'skipped');
+    }
+  }
+
+  function resetGraph() {
+    nodeState = {};
+    completed.clear();
+    Object.keys(timers).forEach(stopNodeTimer);
+    for (const node of Object.keys(PARENTS).concat(['START'])) {
+      setNodeState(node, 'idle');
+    }
+    document.querySelectorAll('.edge').forEach(e => e.classList.remove('active', 'complete', 'skipped'));
+    document.getElementById('event-log').innerHTML =
+      '<div class="placeholder">Pick a scenario and tap Run to start.</div>';
+    document.getElementById('strategy-output').innerHTML =
+      '<div class="card glass empty-state">Race strategy will appear here once the workflow completes.</div>';
+    document.getElementById('stats-output').innerHTML = '';
+  }
+
+  function logEvent(ts, node, output) {
+    const log = document.getElementById('event-log');
+    if (log.querySelector('.placeholder')) log.innerHTML = '';
+    const row = document.createElement('div');
+    row.className = 'row';
+    const preview = typeof output === 'object' && output !== null
+      ? Object.keys(output).length + ' keys'
+      : String(output).slice(0, 40);
+    row.innerHTML = `
+      <span class="ts">${ts.toFixed(2)}s</span>
+      <span class="node-name">${node}</span>
+      <span class="preview">${preview}</span>`;
+    log.appendChild(row);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function renderStrategy(scenario, node, strategy) {
+    const out = document.getElementById('strategy-output');
+    out.innerHTML = `
+      <div class="card glass-strong strategy-hero">
+        <div class="scenario-pill"><span class="dot"></span>${SCENARIO_LABEL[scenario]} · ${node}</div>
+        <h3 class="target-finish">${strategy.target_finish}</h3>
+        <div class="strategy-fields">
+          <div class="strategy-field">
+            <div class="label">Pacing</div>
+            <div class="value">${strategy.pacing_advice}</div>
+          </div>
+          <div class="strategy-field">
+            <div class="label">Fueling</div>
+            <div class="value">${strategy.fueling_plan}</div>
+          </div>
+          <div class="strategy-field">
+            <div class="label">Gear</div>
+            <div class="value">${strategy.gear}</div>
+          </div>
+          <div class="strategy-field warning">
+            <div class="label">Key warning</div>
+            <div class="value">${strategy.key_warning}</div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderStats(totalTime, completionTimes, llmCalls) {
+    const fetchDurations = FETCH_NODES.map(n => completionTimes[n] || 0);
+    const fetchParallel = Math.max(...fetchDurations);
+    const fetchSequential = fetchDurations.reduce((a, b) => a + b, 0);
+    const fetchSaved = fetchSequential - fetchParallel;
+
+    const out = document.getElementById('stats-output');
+    out.innerHTML = `
+      <div class="card stats-card">
+        <h2>Workflow complete</h2>
+        <div class="stats-grid">
+          <div class="stat"><span class="label">Total time</span><span class="value">${totalTime.toFixed(2)}s</span></div>
+          <div class="stat"><span class="label">LLM calls</span><span class="value">${llmCalls}</span></div>
+          <div class="stat"><span class="label">Fetch (parallel)</span><span class="value">${fetchParallel.toFixed(2)}s</span></div>
+          <div class="stat"><span class="label">Fetch (sequential)</span><span class="value">${fetchSequential.toFixed(2)}s</span></div>
+          <div class="stat highlight"><span class="label">Saved by fan-out</span><span class="value">${fetchSaved.toFixed(2)}s</span></div>
+          <div class="stat"><span class="label">Function nodes</span><span class="value">5</span></div>
+        </div>
+      </div>`;
+  }
+
+  // ─── Workflow execution paths ─────────────────────────────────────────────
+  function runWorkflow() {
+    if (activeStream) { activeStream.close(); activeStream = null; }
+    resetGraph();
+
+    const runBtn = document.getElementById('run');
+    const replayBtn = document.getElementById('replay');
+    runBtn.disabled = true;
+    replayBtn.disabled = true;
+
+    const completionTimes = {};
+    let totalTime = 0;
+    let llmCalls = 0;
+
+    recordingEvents = [];
+    recordingT0 = performance.now();
+
+    const url = `/run?scenario=${selectedScenario}&slow_mo=${slowMo}`;
+    const stream = new EventSource(url);
+    activeStream = stream;
+
+    stream.addEventListener('workflow_start', (e) => {
+      recordingEvents.push({ kind: 'workflow_start', ts: 0, data: JSON.parse(e.data) });
+      activateNode('fetch_weather');
+      activateNode('analyze_course');
+      activateNode('pull_fitness');
+      setNodeState('START', 'complete');
+    });
+
+    stream.addEventListener('node_complete', (e) => {
+      const data = JSON.parse(e.data);
+      const wallTs = (performance.now() - recordingT0) / 1000;
+      recordingEvents.push({ kind: 'node_complete', ts: wallTs, data });
+
+      completionTimes[data.node] = data.ts;
+      logEvent(data.ts, data.node, data.output);
+      completeNode(data.node);
+
+      if (STRATEGY_NODES.includes(data.node)) {
+        llmCalls += 1;
+        skipUnchosenStrategies(data.node);
+        renderStrategy(selectedScenario, data.node, data.output);
+      }
+    });
+
+    stream.addEventListener('workflow_complete', (e) => {
+      const data = JSON.parse(e.data);
+      const wallTs = (performance.now() - recordingT0) / 1000;
+      recordingEvents.push({ kind: 'workflow_complete', ts: wallTs, data });
+      totalTime = data.ts;
+      renderStats(totalTime, completionTimes, llmCalls);
+
+      cachedRuns[selectedScenario] = {
+        events: recordingEvents,
+        totalTime,
+        llmCalls,
+        completionTimes: { ...completionTimes },
+      };
+
+      stream.close();
+      activeStream = null;
+      runBtn.disabled = false;
+      updateReplayBtn();
+    });
+
+    stream.addEventListener('error', () => {
+      runBtn.disabled = false;
+      updateReplayBtn();
+      stream.close();
+      activeStream = null;
+    });
+  }
+
+  function replayWorkflow() {
+    const cached = cachedRuns[selectedScenario];
+    if (!cached) return;
+
+    if (activeStream) { activeStream.close(); activeStream = null; }
+    resetGraph();
+
+    const runBtn = document.getElementById('run');
+    const replayBtn = document.getElementById('replay');
+    runBtn.disabled = true;
+    replayBtn.disabled = true;
+
+    const completionTimes = {};
+    let llmCalls = 0;
+    const t0 = performance.now();
+
+    function dispatchOne(idx) {
+      if (idx >= cached.events.length) {
+        runBtn.disabled = false;
+        replayBtn.disabled = false;
+        return;
+      }
+      const ev = cached.events[idx];
+      const targetMs = ev.ts * 1000;
+      const elapsed = performance.now() - t0;
+      const wait = Math.max(0, targetMs - elapsed);
+
+      setTimeout(() => {
+        if (ev.kind === 'workflow_start') {
+          activateNode('fetch_weather');
+          activateNode('analyze_course');
+          activateNode('pull_fitness');
+          setNodeState('START', 'complete');
+        } else if (ev.kind === 'node_complete') {
+          completionTimes[ev.data.node] = ev.data.ts;
+          logEvent(ev.data.ts, ev.data.node, ev.data.output);
+          completeNode(ev.data.node);
+          if (STRATEGY_NODES.includes(ev.data.node)) {
+            llmCalls += 1;
+            skipUnchosenStrategies(ev.data.node);
+            renderStrategy(selectedScenario, ev.data.node, ev.data.output);
+          }
+        } else if (ev.kind === 'workflow_complete') {
+          renderStats(ev.data.ts, completionTimes, llmCalls);
+        }
+        dispatchOne(idx + 1);
+      }, wait);
+    }
+    dispatchOne(0);
+  }
+
+  function updateReplayBtn() {
+    const btn = document.getElementById('replay');
+    btn.disabled = !cachedRuns[selectedScenario];
+  }
+
+  // ─── Wire up ──────────────────────────────────────────────────────────────
+  document.querySelectorAll('.pill-btn[data-scenario]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.pill-btn[data-scenario]').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      selectedScenario = btn.dataset.scenario;
+      updateReplayBtn();
+    });
+  });
+  document.getElementById('slowmo').addEventListener('change', (e) => {
+    slowMo = parseFloat(e.target.value);
+  });
+  document.getElementById('run').addEventListener('click', runWorkflow);
+  document.getElementById('replay').addEventListener('click', replayWorkflow);
+
+  resetGraph();
+</script>
+</body>
+</html>
