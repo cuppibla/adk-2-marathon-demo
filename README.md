@@ -41,6 +41,75 @@ uv run python smoke_test.py             # Minimal ADK 2.0 Workflow sanity check
 
 ---
 
+## How to play the demo
+
+Once the server is running and the browser is at `http://127.0.0.1:8000/`, scroll down through each mode in order. Each mode has presets — you don't have to type anything to test.
+
+### Mode 1: Single Runner (Pillar 1 · Graph workflows)
+
+At the top of the page.
+
+1. Pick a scenario in the header: **Hot · Boston**, **Normal · Berlin**, or **Cold · Chicago**
+2. (Optional) Change **Speed** to 2× slow to make the parallel pulse easier to watch
+3. Click the green **Run ▶** button
+
+**What you should see:** Three nodes (fetch_weather, analyze_course, pull_fitness) light up cyan and pulse *in parallel* with live timers. They complete at different times (1.0s, 1.5s, 2.0s). JoinNode and router fire. One of the three strategy agents (hot/normal/cold) generates a structured `RaceStrategy` — target finish time, pacing, fueling, gear, key warning. Stats card shows "1 LLM call · 2.5s saved by fan-out."
+
+### Mode 2: Concierge (Pillar 2 · Collaborative agents)
+
+Scroll down past Mode 1. The chat panel will be unlocked after Mode 1 completes (auto-scrolls).
+
+**Click any of these 5 suggestion pills:**
+
+| Pill | What it asks | Specialists that should fire |
+|---|---|---|
+| **Should I race today?** | medical + weather + pacing concerns | 3 in parallel |
+| **Knee pain mid-race** | "My left knee is twinging at mile 18" | 1 (medical only) |
+| **About fueling** | "What about my fueling plan?" | 1 (nutrition only) |
+| **It's raining** | "It's raining now, should I change my plan?" | 3 (weather + gear + pacing) |
+| **Full review** | "Anything I should worry about overall?" | All 6 in parallel |
+
+**Or type your own question** about anything related to your race: medical, weather, pacing, gear, nutrition, or mental prep. The coordinator picks the relevant specialists.
+
+**What you should see:** Different questions cause different *subsets* of the 6 specialist pills to light up cyan and pulse, then turn mint when they finish. The synthesized answer appears in the chat history with a tag like *"Concierge · 3 specialists in parallel: Medical, Weather, Pacing."*
+
+### Mode 3: Deep Research (Pillar 3 · Dynamic workflows)
+
+Scroll further down past the chat panel.
+
+**Click any of these 3 preset buttons:**
+
+| Preset | Question it asks | Expected tree |
+|---|---|---|
+| **Deep-dive: Boston Marathon** | *"Tell me everything I should know about racing the Boston Marathon — course, weather history, common pitfalls, pacing strategy, and what to wear."* | 5 top-level + ~12 recursive children (biggest tree) |
+| **Hot weather prep** | *"What do I need to know about racing a marathon in hot conditions (above 78°F)? Cover pacing, fueling, gear, and medical risks."* | ~5 top-level + ~6 recursive children |
+| **Post-race recovery** | *"I just finished my first marathon. Give me a comprehensive recovery plan for the next 4 weeks."* | ~5 top-level + variable children |
+
+**Or type your own open-ended marathon question** (5+ words, broad enough to decompose). Good prompts:
+
+- *"How should I train for my first marathon in 6 months?"*
+- *"What gear do I need for a marathon in cold rain?"*
+- *"What are the most common mistakes new marathoners make?"*
+- *"How do elite runners pace themselves through hilly courses?"*
+- *"What should I eat the week before a marathon?"*
+- *"How do I avoid hitting the wall at mile 20?"*
+
+Avoid: yes/no questions, very narrow questions, off-topic queries.
+
+**What you should see:** Purple decomposer card pulses, then 5-ish question cards appear cyan. As each parent completes, indented child cards appear underneath (these were spawned recursively by the LLM at runtime). All cards turn mint when done. A synthesized briefing card appears at the bottom with a headline, sections, and key warnings. Stats card shows the LLM-call count and the runtime-decided tree shape. **Takes 20-30 seconds** for the full Boston preset.
+
+### Recommended demo order for a 20-minute talk
+
+For best storytelling, do them in sequence:
+
+1. **Mode 1** (4 min) — establish what graph workflows are with the parallel pulse
+2. **Mode 2** (4 min) — show the collab dispatch by clicking 2-3 different suggestion pills (start with "Should I race today?" then "About fueling" — the contrast is the demo)
+3. **Mode 3** (3 min) — click "Deep-dive: Boston Marathon" and narrate during the tree growth
+
+See [VIDEO_SCRIPT.md](VIDEO_SCRIPT.md) for the full talk script with exact narration.
+
+---
+
 ## What's in this repo
 
 ```
