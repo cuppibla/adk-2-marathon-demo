@@ -23,6 +23,7 @@ from google.adk.sessions import InMemorySessionService
 from google.genai import types as gtypes
 
 from workflows.concierge import race_concierge
+from workflows.deep_research import deep_research_workflow
 from workflows.strategy_graph import root_agent
 from workflows.team_planner import team_workflow
 
@@ -342,6 +343,137 @@ async def team(roster: str = Query(..., pattern="^(alpha|omega)$")):
             raise
 
     return EventSourceResponse(event_gen())
+
+
+RESEARCH_PRESETS: dict[str, str] = {
+    "boston": "Tell me everything I should know about racing the Boston Marathon — course, weather history, common pitfalls, pacing strategy, and what to wear.",
+    "heat": "What do I need to know about racing a marathon in hot conditions (above 78°F)? Cover pacing, fueling, gear, and medical risks.",
+    "recovery": "I just finished my first marathon. Give me a comprehensive recovery plan for the next 4 weeks.",
+}
+
+
+def _make_node_id(path: str, idx: int) -> str:
+    """Derive a stable id for a node from its node_info.path and a counter."""
+    # Strip everything before the last meaningful component
+    last = path.rsplit("/", 1)[-1] if path else f"n{idx}"
+    return f"{last}_{idx}"
+
+
+@app.get("/research")
+async def research(
+    preset: str | None = Query(None, pattern="^(boston|heat|recovery)$"),
+    query: str | None = Query(None, min_length=5, max_length=500),
+):
+    """Run the Pillar 3 deep research workflow over a user query (or preset).
+
+    Streams events as the research tree grows:
+    - workflow_start: query received
+    - decompose_complete: top-level sub-questions known
+    - research_complete: a research node finished (may include spawned children)
+    - synthesize_complete: final briefing ready
+    """
+    if preset:
+        chosen_query = RESEARCH_PRESETS[preset]
+    elif query:
+        chosen_query = query
+    else:
+        async def err_gen():
+            yield {
+                "event": "error",
+                "data": json.dumps({"error": "Pass either ?preset=boston|heat|recovery or ?query=..."}),
+            }
+        return EventSourceResponse(err_gen())
+
+    msg = gtypes.Content(role="user", parts=[gtypes.Part(text=chosen_query)])
+
+    async def event_gen():
+        t0 = time.perf_counter()
+        yield {
+            "event": "workflow_start",
+            "data": json.dumps({"query": chosen_query, "ts": 0.0}),
+        }
+
+        session_service = InMemorySessionService()
+        runner = Runner(
+            node=deep_research_workflow,
+            app_name="research_app",
+            session_service=session_service,
+            auto_create_session=True,
+        )
+
+        # Track which top-level questions we've already announced via decompose_complete
+        # so we can correctly attribute research events to "root" vs a parent question.
+        top_level_questions: set[str] = set()
+
+        try:
+            async for event in runner.run_async(
+                user_id="researcher",
+                session_id=f"research_session_{int(time.time()*1000)}",
+                new_message=msg,
+            ):
+                out = _event_output(event)
+                node = _node_name(event)
+                ts = round(time.perf_counter() - t0, 3)
+
+                # decompose node emits a list of {question, depth, original_query} dicts
+                if node == "decompose" and isinstance(out, list) and out and isinstance(out[0], dict) and "question" in out[0]:
+                    top_level_questions = {item["question"] for item in out}
+                    yield {
+                        "event": "decompose_complete",
+                        "data": json.dumps({
+                            "sub_questions": [item["question"] for item in out],
+                            "ts": ts,
+                        }),
+                    }
+
+                # research_topic node — emits a dict with question/summary/children/etc.
+                elif node == "research_topic" and isinstance(out, dict) and "question" in out and "summary" in out:
+                    is_top_level = out["question"] in top_level_questions
+                    yield {
+                        "event": "research_complete",
+                        "data": json.dumps({
+                            "question": out["question"],
+                            "depth": out.get("depth", 1),
+                            "is_top_level": is_top_level,
+                            "summary": out["summary"],
+                            "key_facts": out.get("key_facts", []),
+                            "spawned_children": [
+                                {"question": c["question"], "summary": c.get("summary", "")}
+                                for c in out.get("children", []) or []
+                            ],
+                            "ts": ts,
+                        }),
+                    }
+
+                # synthesize node — final briefing
+                elif node == "synthesize" and isinstance(out, dict) and "briefing" in out:
+                    yield {
+                        "event": "synthesize_complete",
+                        "data": json.dumps({
+                            "briefing": out["briefing"],
+                            "tree_total": _count_tree_nodes(out.get("research_tree", [])),
+                            "ts": ts,
+                        }, default=str),
+                    }
+        except Exception as e:
+            yield {"event": "error", "data": json.dumps({"error": str(e)})}
+            raise
+        finally:
+            yield {
+                "event": "workflow_complete",
+                "data": json.dumps({"ts": round(time.perf_counter() - t0, 3)}),
+            }
+
+    return EventSourceResponse(event_gen())
+
+
+def _count_tree_nodes(tree: list) -> int:
+    """Count total nodes in a nested research tree (top-level + children + grandchildren)."""
+    total = 0
+    for node in tree:
+        total += 1
+        total += _count_tree_nodes(node.get("children", []) or [])
+    return total
 
 
 if __name__ == "__main__":

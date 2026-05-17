@@ -10,6 +10,9 @@ from .schemas import (
     RunnerSpec,
     RunnerPlan,
     TeamSummary,
+    DecomposerOutput,
+    ResearchFinding,
+    DeepResearchBriefing,
 )
 from .scenarios import SCENARIOS, scenario, slow_mo
 
@@ -24,6 +27,9 @@ __all__ = [
     "RunnerSpec",
     "RunnerPlan",
     "TeamSummary",
+    "DecomposerOutput",
+    "ResearchFinding",
+    "DeepResearchBriefing",
     "SCENARIOS",
     "scenario",
     "slow_mo",

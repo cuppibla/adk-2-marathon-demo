@@ -88,3 +88,61 @@ class TeamSummary(BaseModel):
     count: int = Field(description="Number of runners planned.")
     notes: str = Field(description="One-sentence summary across the team.")
 
+
+# ─── Deep Research (Pillar 3 — new) schemas ───────────────────────────────────
+
+class DecomposerOutput(BaseModel):
+    """Output of the decompose agent — the research plan."""
+    plan_summary: str = Field(
+        description="One sentence explaining how you decomposed the question."
+    )
+    sub_questions: list[str] = Field(
+        description="3-7 specific, non-overlapping sub-questions that together "
+                    "comprehensively answer the user's main question.",
+        min_length=3,
+        max_length=7,
+    )
+
+
+class ResearchFinding(BaseModel):
+    """Output of one research agent invocation — findings on a single sub-question."""
+    summary: str = Field(
+        description="Concise 2-3 sentence summary of findings on this sub-question."
+    )
+    key_facts: list[str] = Field(
+        description="3-5 specific factual points or actionable insights discovered.",
+        min_length=2,
+        max_length=5,
+    )
+    needs_deeper: bool = Field(
+        description="True if these findings reveal a topic that warrants deeper "
+                    "recursive investigation. Set False if the question is "
+                    "fully answered."
+    )
+    deeper_questions: list[str] = Field(
+        default_factory=list,
+        description="If needs_deeper is True, 1-3 specific, well-formed deeper "
+                    "questions to investigate. Empty list if needs_deeper is False.",
+        max_length=3,
+    )
+
+
+class DeepResearchBriefing(BaseModel):
+    """Final synthesized output of the deep research workflow."""
+    headline: str = Field(
+        description="One-sentence headline summarizing the most important takeaway."
+    )
+    sections: list[str] = Field(
+        description="3-6 thematic paragraphs covering the research areas.",
+        min_length=3,
+        max_length=6,
+    )
+    key_warnings: list[str] = Field(
+        description="2-4 actionable warnings or critical considerations.",
+        min_length=1,
+        max_length=4,
+    )
+    summary: str = Field(
+        description="Closing paragraph that ties everything together actionably."
+    )
+
