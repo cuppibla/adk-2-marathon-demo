@@ -64,32 +64,7 @@ class SpecialistResponse(BaseModel):
     reasoning: str = Field(description="One concise sentence with the why, referencing specific data.")
 
 
-# ─── Team mode (Pillar 3) schemas ─────────────────────────────────────────────
-
-class RunnerSpec(BaseModel):
-    """One runner in a team roster."""
-    name: str = Field(description="Runner's display name.")
-    scenario: Literal["HOT", "NORMAL", "COLD"] = Field(
-        description="Which canned scenario this runner is facing."
-    )
-
-
-class RunnerPlan(BaseModel):
-    """The completed plan for one runner — output of the per-runner subworkflow."""
-    runner_name: str
-    scenario: str
-    bundled_data: BundledRunData
-    strategy: RaceStrategy
-
-
-class TeamSummary(BaseModel):
-    """Aggregated output of the team workflow — produced after all runners are planned."""
-    plans: list[RunnerPlan]
-    count: int = Field(description="Number of runners planned.")
-    notes: str = Field(description="One-sentence summary across the team.")
-
-
-# ─── Deep Research (Pillar 3 — new) schemas ───────────────────────────────────
+# ─── Deep Research (Pillar 3) schemas ─────────────────────────────────────────
 
 class DecomposerOutput(BaseModel):
     """Output of the decompose agent — the research plan."""

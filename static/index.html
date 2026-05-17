@@ -750,8 +750,27 @@
     cursor: not-allowed;
   }
 
-  /* ─── Team panel (Pillar 3 — Dynamic workflows) ────────────────────────── */
-  .team-section {
+  /* ─── Purple "Pillar 3" tag (shared) ──────────────────────────────────── */
+  .pillar-tag.purple {
+    background: rgba(134, 109, 220, 0.14);
+    color: #5a4eb8;
+    border-color: rgba(134, 109, 220, 0.35);
+  }
+
+  /* ─── Pillar-3 stats card (used by research) ──────────────────────────── */
+  .pillar-stats-card {
+    padding: 22px 26px;
+    background:
+      linear-gradient(135deg, rgba(134, 109, 220, 0.14), rgba(126, 229, 193, 0.10));
+    border: 1px solid rgba(134, 109, 220, 0.35);
+  }
+  .pillar-stats-card h2 {
+    color: #5a4eb8;
+    margin-bottom: 14px;
+  }
+
+  /* ─── Research panel (Pillar 3 — Deep Research) ────────────────────────── */
+  .research-section {
     max-width: 1200px;
     margin: 8px auto 56px;
     padding: 0 16px;
@@ -759,169 +778,252 @@
     flex-direction: column;
     gap: 16px;
   }
-  .team-banner .pillar-tag.purple {
-    background: rgba(134, 109, 220, 0.14);
-    color: #5a4eb8;
-    border-color: rgba(134, 109, 220, 0.35);
-  }
-
-  .team-pickers {
-    padding: 16px 20px;
+  .research-controls {
+    padding: 16px 22px;
     display: flex;
+    flex-direction: column;
     gap: 12px;
+  }
+  .research-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .research-input-row input {
+    flex: 1;
+    background: white;
+    border: 1px solid var(--hairline-2);
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text);
+    transition: all 0.2s var(--ease);
+  }
+  .research-input-row input:focus {
+    outline: none;
+    border-color: #6b6dd6;
+    box-shadow: 0 0 0 3px rgba(134, 109, 220, 0.15);
+  }
+  .research-input-row input:disabled { opacity: 0.5; cursor: not-allowed; }
+  .research-presets {
+    display: flex;
+    gap: 8px;
     flex-wrap: wrap;
     align-items: center;
   }
-  .team-pickers .label {
+  .research-presets .label {
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-faint);
     text-transform: uppercase;
-    letter-spacing: 0.6px;
-    margin-right: 6px;
-  }
-  .roster-btn {
-    background: white;
-    color: var(--text);
-    border: 1px solid var(--hairline-2);
-    padding: 9px 18px;
-    border-radius: 999px;
-    font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.25s var(--spring);
-    box-shadow: 0 1px 2px rgba(80, 120, 180, 0.06);
-  }
-  .roster-btn:hover:not(:disabled) {
-    border-color: #6b6dd6;
-    color: #5a4eb8;
-    box-shadow: 0 4px 12px -2px rgba(134, 109, 220, 0.25);
-  }
-  .roster-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-  .roster-btn .count {
-    display: inline-block;
-    margin-left: 8px;
-    font-weight: 700;
-    background: rgba(134, 109, 220, 0.16);
-    color: #5a4eb8;
-    padding: 2px 8px;
-    border-radius: 999px;
-    font-size: 11px;
+    letter-spacing: 0.5px;
   }
 
-  .team-runners {
+  .research-tree {
     padding: 18px 22px;
+    min-height: 100px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    min-height: 120px;
+    gap: 4px;
   }
-  .team-runners .empty {
+  .research-tree .empty {
     text-align: center;
     color: var(--text-faint);
     font-style: italic;
     font-size: 12px;
     padding: 22px 0;
   }
-  .runner-row {
-    display: grid;
-    grid-template-columns: 44px 1fr 80px 110px;
-    gap: 14px;
+
+  /* The "decomposer" head row */
+  .tree-head {
+    display: flex;
     align-items: center;
-    padding: 10px 14px;
+    gap: 12px;
+    padding: 12px 16px;
     background: white;
     border: 1px solid var(--hairline-2);
     border-radius: 14px;
-    transition: all 0.4s var(--spring);
+    transition: all 0.3s var(--spring);
+    margin-bottom: 8px;
   }
-  .runner-avatar {
-    width: 36px;
-    height: 36px;
+  .tree-head.active {
+    border-color: #6b6dd6;
+    background: rgba(134, 109, 220, 0.06);
+    box-shadow: 0 0 14px rgba(134, 109, 220, 0.20);
+    animation: pulse-purple 1.2s ease-in-out infinite;
+  }
+  .tree-head.complete {
+    border-color: var(--complete);
+    background: rgba(54, 184, 134, 0.07);
+  }
+  .tree-head .icon {
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    background: linear-gradient(135deg, rgba(168, 213, 255, 0.6), rgba(200, 232, 218, 0.6));
+    background: linear-gradient(135deg, rgba(134, 109, 220, 0.4), rgba(126, 229, 193, 0.3));
     border: 1px solid var(--hairline-2);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text);
+    font-size: 11px;
+    color: white;
+    flex-shrink: 0;
   }
-  .runner-info {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.3;
+  .tree-head .body {
+    flex: 1;
     min-width: 0;
   }
-  .runner-name {
+  .tree-head .title {
     font-size: 13px;
     font-weight: 600;
     color: var(--text);
   }
-  .runner-scenario {
+  .tree-head .meta {
     font-size: 11px;
     color: var(--text-soft);
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    font-weight: 500;
+    margin-top: 2px;
   }
-  .runner-status {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-faint);
-    font-variant-numeric: tabular-nums;
-    text-align: right;
-  }
-  .runner-finish {
-    font-size: 14px;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    color: var(--text-soft);
-    text-align: right;
-  }
-  .runner-row.active {
-    border-color: var(--active);
-    background: rgba(46, 169, 236, 0.07);
-    box-shadow: 0 0 12px rgba(46, 169, 236, 0.20);
-    animation: pulse-row 1.4s ease-in-out infinite;
-  }
-  .runner-row.active .runner-avatar {
-    background: linear-gradient(135deg, rgba(155, 215, 250, 0.7), rgba(195, 230, 250, 0.6));
-    border-color: var(--active);
-  }
-  .runner-row.active .runner-status { color: var(--active); }
-  .runner-row.complete {
-    border-color: var(--complete);
-    background: rgba(54, 184, 134, 0.07);
-  }
-  .runner-row.complete .runner-avatar {
-    background: linear-gradient(135deg, rgba(170, 225, 200, 0.7), rgba(200, 235, 215, 0.6));
-    border-color: var(--complete);
-  }
-  .runner-row.complete .runner-status {
-    color: #1a6e4d;
-  }
-  .runner-row.complete .runner-finish {
-    color: #1a6e4d;
-  }
-  @keyframes pulse-row {
-    0%, 100% { box-shadow: 0 0 10px rgba(46, 169, 236, 0.18); }
-    50%      { box-shadow: 0 0 20px rgba(46, 169, 236, 0.32); }
+  @keyframes pulse-purple {
+    0%, 100% { box-shadow: 0 0 12px rgba(134, 109, 220, 0.18); }
+    50%      { box-shadow: 0 0 22px rgba(134, 109, 220, 0.34); }
   }
 
-  .team-stats-card {
-    padding: 22px 26px;
-    background:
-      linear-gradient(135deg, rgba(134, 109, 220, 0.14), rgba(126, 229, 193, 0.10));
-    border: 1px solid rgba(134, 109, 220, 0.35);
+  /* Tree node card */
+  .tree-node {
+    display: grid;
+    grid-template-columns: 24px 1fr 24px;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 14px;
+    background: white;
+    border: 1px solid var(--hairline-2);
+    border-radius: 12px;
+    margin: 4px 0;
+    transition: all 0.4s var(--spring);
   }
-  .team-stats-card h2 {
+  .tree-node.depth-1 { margin-left: 0; }
+  .tree-node.depth-2 { margin-left: 36px; background: rgba(255, 255, 255, 0.7); }
+  .tree-node.active {
+    border-color: var(--active);
+    background: rgba(46, 169, 236, 0.06);
+    box-shadow: 0 0 12px rgba(46, 169, 236, 0.18);
+    animation: pulse-pill 1.4s ease-in-out infinite;
+  }
+  .tree-node.complete {
+    border-color: var(--complete);
+    background: rgba(54, 184, 134, 0.06);
+  }
+  .tree-node .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-faint);
+    margin-top: 6px;
+    transition: background 0.3s var(--ease);
+  }
+  .tree-node.active .dot { background: var(--active); box-shadow: 0 0 6px var(--active); }
+  .tree-node.complete .dot { background: var(--complete); }
+  .tree-node .body {
+    min-width: 0;
+  }
+  .tree-node .question {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .tree-node.depth-2 .question { font-size: 12px; font-weight: 500; }
+  .tree-node .summary {
+    font-size: 11.5px;
+    color: var(--text-soft);
+    margin-top: 6px;
+    line-height: 1.45;
+    display: none;
+  }
+  .tree-node.complete .summary { display: block; }
+  .tree-node .facts {
+    margin-top: 4px;
+    display: none;
+  }
+  .tree-node.complete .facts { display: block; }
+  .tree-node .facts .fact {
+    font-size: 11px;
+    color: var(--text-soft);
+    margin: 2px 0;
+    padding-left: 10px;
+    position: relative;
+  }
+  .tree-node .facts .fact::before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: var(--complete);
+  }
+  .tree-node .status {
+    font-size: 11px;
+    color: var(--text-faint);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    margin-top: 4px;
+  }
+  .tree-node.complete .status { color: #1a6e4d; }
+
+  .briefing-card {
+    padding: 24px 28px;
+    background:
+      linear-gradient(135deg, rgba(134, 109, 220, 0.10), rgba(168, 213, 255, 0.10));
+    border: 1px solid rgba(134, 109, 220, 0.30);
+  }
+  .briefing-card .pill-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    background: rgba(134, 109, 220, 0.16);
     color: #5a4eb8;
+    border: 1px solid rgba(134, 109, 220, 0.32);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
     margin-bottom: 14px;
+  }
+  .briefing-card h3 {
+    margin: 0 0 18px;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text);
+    letter-spacing: -0.2px;
+  }
+  .briefing-card h4 {
+    margin: 18px 0 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+  }
+  .briefing-card ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--text);
+  }
+  .briefing-card ul li {
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 6px 0;
+  }
+  .briefing-card .warning-list li::marker { color: var(--warn); }
+  .briefing-card .closing-summary {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(28, 37, 56, 0.08);
+    color: var(--text);
+    font-size: 13px;
+    line-height: 1.55;
   }
 </style>
 </head>
@@ -1080,7 +1182,7 @@
 </main>
 
 <button class="scroll-hint" id="scroll-hint" onclick="document.getElementById('chat-section').scrollIntoView({behavior:'smooth', block:'start'})">
-  More below — Concierge (Pillar 2) + Team (Pillar 3)
+  More below — Concierge (Pillar 2) + Team + Research (Pillar 3)
   <span class="arrow">▾</span>
 </button>
 
@@ -1125,28 +1227,36 @@
   </div>
 </section>
 
-<section class="team-section" id="team-section">
-  <div class="panel glass chat-banner team-banner">
+<section class="research-section" id="research-section">
+  <div class="panel glass chat-banner">
     <div>
       <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-        <h2>Team Race Day Planner</h2>
-        <span class="pillar-tag purple">Pillar 3 · Dynamic Workflows</span>
+        <h2>Deep Research</h2>
+        <span class="pillar-tag purple">Pillar 3 v2 · Dynamic Workflows</span>
       </div>
-      <p class="sub">Plan strategies for a roster of N runners in parallel. Roster size is data-driven — the topology adapts at runtime.</p>
+      <p class="sub">Ask an open-ended question. A decomposer agent breaks it into sub-questions, each is researched in parallel, and some sub-findings spawn even deeper questions — the tree's shape is decided by the LLMs at runtime.</p>
     </div>
   </div>
 
-  <div class="panel glass team-pickers">
-    <span class="label">Roster:</span>
-    <button class="roster-btn" data-roster="alpha">Team Alpha <span class="count">3</span></button>
-    <button class="roster-btn" data-roster="omega">Team Omega <span class="count">10</span></button>
+  <div class="panel glass research-controls">
+    <div class="research-input-row">
+      <input type="text" id="research-input" placeholder="Ask anything about marathon racing..." />
+      <button class="action-btn" id="research-send">Research →</button>
+    </div>
+    <div class="research-presets">
+      <span class="label">Or try a preset:</span>
+      <button class="suggestion-pill" data-preset="boston">Deep-dive: Boston Marathon</button>
+      <button class="suggestion-pill" data-preset="heat">Hot weather prep</button>
+      <button class="suggestion-pill" data-preset="recovery">Post-race recovery</button>
+    </div>
   </div>
 
-  <div class="panel glass team-runners" id="team-runners">
-    <div class="empty">Pick a roster above to start the parallel fan-out.</div>
+  <div class="panel glass research-tree" id="research-tree">
+    <div class="empty">Pick a preset or type a question to start the research.</div>
   </div>
 
-  <div id="team-stats"></div>
+  <div id="research-briefing"></div>
+  <div id="research-stats"></div>
 </section>
 
 <script>
@@ -1616,130 +1726,187 @@
     btn.addEventListener('click', () => sendChatQuestion(btn.dataset.q));
   });
 
-  // ─── Pillar 3 — Team mode ─────────────────────────────────────────────────
-  let teamBusy = false;
-  const SCENARIO_DESC = {
-    HOT:    'Hot · Boston',
-    NORMAL: 'Normal · Berlin',
-    COLD:   'Cold · Chicago',
-  };
+  // ─── Pillar 3 — Deep Research ────────────────────────────────────────────
+  let researchBusy = false;
+  const researchNodes = {};  // questionText → DOM element
 
-  function initialsOf(name) {
-    const parts = name.replace(/_/g, ' ').replace(/-/g, ' ').split(/\s+/).filter(Boolean);
-    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c =>
+      ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  function renderRunnerRows(roster) {
-    const container = document.getElementById('team-runners');
-    container.innerHTML = '';
-    roster.forEach(r => {
-      const row = document.createElement('div');
-      row.className = 'runner-row active';
-      row.dataset.name = r.name;
-      row.innerHTML = `
-        <div class="runner-avatar">${initialsOf(r.name)}</div>
-        <div class="runner-info">
-          <div class="runner-name">${r.name}</div>
-          <div class="runner-scenario">${SCENARIO_DESC[r.scenario] || r.scenario}</div>
-        </div>
-        <div class="runner-status" data-runner-timer>0.0s</div>
-        <div class="runner-finish" data-runner-finish>…</div>
-      `;
-      container.appendChild(row);
-    });
+  function makeTreeNode(question, depth, status = 'active') {
+    const div = document.createElement('div');
+    div.className = `tree-node depth-${depth} ${status}`;
+    div.dataset.question = question;
+    div.innerHTML = `
+      <div class="dot"></div>
+      <div class="body">
+        <div class="question">${escapeHtml(question)}</div>
+        <div class="summary"></div>
+        <div class="facts"></div>
+      </div>
+      <div class="status">${status === 'active' ? '⏳' : status === 'complete' ? '✓' : '—'}</div>`;
+    return div;
   }
 
-  function startRunnerTimers(roster, t0) {
-    // Update all runner timers in lockstep
-    const interval = setInterval(() => {
-      const elapsed = (performance.now() - t0) / 1000;
-      document.querySelectorAll('.runner-row.active [data-runner-timer]').forEach(el => {
-        el.textContent = elapsed.toFixed(1) + 's';
-      });
-      if (!document.querySelector('.runner-row.active')) clearInterval(interval);
-    }, 100);
-    return interval;
+  function markNodeComplete(node, summary, facts) {
+    node.classList.remove('active');
+    node.classList.add('complete');
+    if (summary) node.querySelector('.summary').textContent = summary;
+    const factsEl = node.querySelector('.facts');
+    if (facts && facts.length) {
+      factsEl.innerHTML = facts.map(f => `<div class="fact">${escapeHtml(f)}</div>`).join('');
+    }
+    node.querySelector('.status').textContent = '✓';
   }
 
-  function markRunnerComplete(name, targetFinish, ts) {
-    const row = document.querySelector(`.runner-row[data-name="${name}"]`);
-    if (!row) return;
-    row.classList.remove('active');
-    row.classList.add('complete');
-    row.querySelector('[data-runner-timer]').textContent = ts.toFixed(1) + 's';
-    row.querySelector('[data-runner-finish]').textContent = targetFinish || '—';
-  }
+  function startResearch(preset, query) {
+    if (researchBusy) return;
+    researchBusy = true;
 
-  function renderTeamStats(totalTime, completionTimes, count) {
-    const slowest = Math.max(...completionTimes);
-    const sumIfSerial = completionTimes.reduce((a, b) => a + b, 0);
-    const speedup = sumIfSerial / Math.max(totalTime, 0.001);
-    document.getElementById('team-stats').innerHTML = `
-      <div class="panel team-stats-card">
-        <h2>Team plan complete</h2>
-        <div class="stats-grid">
-          <div class="stat"><span class="label">Runners planned</span><span class="value">${count}</span></div>
-          <div class="stat"><span class="label">Total wall time</span><span class="value">${totalTime.toFixed(2)}s</span></div>
-          <div class="stat"><span class="label">Slowest runner</span><span class="value">${slowest.toFixed(2)}s</span></div>
-          <div class="stat"><span class="label">Sum if serial</span><span class="value">${sumIfSerial.toFixed(2)}s</span></div>
-          <div class="stat highlight"><span class="label">Parallel speedup</span><span class="value">${speedup.toFixed(1)}×</span></div>
-          <div class="stat"><span class="label">LLM calls</span><span class="value">${count}</span></div>
-        </div>
+    // Reset
+    const tree = document.getElementById('research-tree');
+    tree.innerHTML = '';
+    document.getElementById('research-briefing').innerHTML = '';
+    document.getElementById('research-stats').innerHTML = '';
+    Object.keys(researchNodes).forEach(k => delete researchNodes[k]);
+    document.getElementById('research-input').disabled = true;
+    document.getElementById('research-send').disabled = true;
+    document.querySelectorAll('.research-presets .suggestion-pill').forEach(b => b.disabled = true);
+
+    // Decomposer head row appears immediately as "active"
+    const head = document.createElement('div');
+    head.className = 'tree-head active';
+    head.id = 'tree-head';
+    head.innerHTML = `
+      <div class="icon">⌥</div>
+      <div class="body">
+        <div class="title">Decomposing query into sub-questions...</div>
+        <div class="meta">${escapeHtml(query || `preset: ${preset}`)}</div>
       </div>`;
-  }
+    tree.appendChild(head);
 
-  function runTeam(rosterId) {
-    if (teamBusy) return;
-    teamBusy = true;
-    document.querySelectorAll('.roster-btn').forEach(b => b.disabled = true);
-    document.getElementById('team-stats').innerHTML = '';
-
-    const completionTimes = [];
-    let totalTime = 0;
-    let runnerCount = 0;
-    let timerInterval = null;
-    let t0 = performance.now();
-
-    const url = `/team?roster=${rosterId}`;
+    const url = preset
+      ? `/research?preset=${preset}`
+      : `/research?query=${encodeURIComponent(query)}`;
     const stream = new EventSource(url);
+    const t0 = performance.now();
+    let llmCalls = 0;
+    let topLevelCount = 0;
+    let totalTreeNodes = 0;
 
-    stream.addEventListener('team_start', (e) => {
+    stream.addEventListener('workflow_start', () => {});
+
+    stream.addEventListener('decompose_complete', (e) => {
       const data = JSON.parse(e.data);
-      runnerCount = data.count;
-      renderRunnerRows(data.roster);
-      t0 = performance.now();
-      timerInterval = startRunnerTimers(data.roster, t0);
+      llmCalls += 1; // decomposer was one LLM call
+      topLevelCount = data.sub_questions.length;
+      // Mark decomposer complete
+      head.classList.remove('active');
+      head.classList.add('complete');
+      head.querySelector('.title').textContent = `Decomposed into ${data.sub_questions.length} sub-questions`;
+      // Render each top-level question as active
+      data.sub_questions.forEach(q => {
+        const node = makeTreeNode(q, 1, 'active');
+        researchNodes[q] = node;
+        tree.appendChild(node);
+      });
     });
 
-    stream.addEventListener('runner_complete', (e) => {
+    stream.addEventListener('research_complete', (e) => {
       const data = JSON.parse(e.data);
-      const target = data.strategy && data.strategy.target_finish ? data.strategy.target_finish : '—';
-      completionTimes.push(data.ts);
-      markRunnerComplete(data.name, target, data.ts);
+      llmCalls += 1;
+      totalTreeNodes += 1;
+      if (data.is_top_level) {
+        const parent = researchNodes[data.question];
+        if (parent) {
+          markNodeComplete(parent, data.summary, data.key_facts);
+          // Append spawned children as already-complete nodes (they arrived earlier)
+          if (data.spawned_children && data.spawned_children.length) {
+            // Find where the parent ended; insert child nodes after it
+            const childContainer = document.createElement('div');
+            childContainer.style.display = 'contents';
+            data.spawned_children.forEach(child => {
+              const childNode = makeTreeNode(child.question, 2, 'complete');
+              childNode.querySelector('.summary').textContent = child.summary || '';
+              childNode.querySelector('.status').textContent = '✓';
+              // Insert right after parent (or last sibling of same parent)
+              parent.parentNode.insertBefore(childNode, parent.nextSibling);
+            });
+          }
+        }
+      }
+      // Children events with is_top_level=false: already counted in totalTreeNodes;
+      // visual is rendered above when parent fires
     });
 
-    stream.addEventListener('team_complete', (e) => {
+    stream.addEventListener('synthesize_complete', (e) => {
       const data = JSON.parse(e.data);
-      totalTime = data.ts;
-      if (timerInterval) clearInterval(timerInterval);
-      renderTeamStats(totalTime, completionTimes, runnerCount);
+      llmCalls += 1; // synthesizer
+      const b = data.briefing;
+      document.getElementById('research-briefing').innerHTML = `
+        <div class="panel glass-strong briefing-card">
+          <div class="pill-tag">Synthesized briefing</div>
+          <h3>${escapeHtml(b.headline)}</h3>
+          <h4>Research findings</h4>
+          <ul>${b.sections.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>
+          <h4>Key warnings</h4>
+          <ul class="warning-list">${b.key_warnings.map(w => `<li>${escapeHtml(w)}</li>`).join('')}</ul>
+          <div class="closing-summary">${escapeHtml(b.summary)}</div>
+        </div>`;
+      document.getElementById('research-stats').innerHTML = `
+        <div class="panel pillar-stats-card">
+          <h2>Research complete</h2>
+          <div class="stats-grid">
+            <div class="stat"><span class="label">Total tree nodes</span><span class="value">${data.tree_total}</span></div>
+            <div class="stat"><span class="label">Top-level questions</span><span class="value">${topLevelCount}</span></div>
+            <div class="stat"><span class="label">Recursive children</span><span class="value">${data.tree_total - topLevelCount}</span></div>
+            <div class="stat"><span class="label">LLM calls</span><span class="value">${llmCalls}</span></div>
+            <div class="stat highlight"><span class="label">Wall time</span><span class="value">${data.ts.toFixed(1)}s</span></div>
+            <div class="stat"><span class="label">Topology</span><span class="value">Decided at runtime</span></div>
+          </div>
+        </div>`;
+    });
+
+    stream.addEventListener('workflow_complete', () => {
       stream.close();
-      teamBusy = false;
-      document.querySelectorAll('.roster-btn').forEach(b => b.disabled = false);
+      researchBusy = false;
+      document.getElementById('research-input').disabled = false;
+      document.getElementById('research-send').disabled = false;
+      document.querySelectorAll('.research-presets .suggestion-pill').forEach(b => b.disabled = false);
     });
 
-    stream.addEventListener('error', (e) => {
-      console.error('team SSE error', e);
-      if (timerInterval) clearInterval(timerInterval);
+    stream.addEventListener('error', () => {
       stream.close();
-      teamBusy = false;
-      document.querySelectorAll('.roster-btn').forEach(b => b.disabled = false);
+      researchBusy = false;
+      document.getElementById('research-input').disabled = false;
+      document.getElementById('research-send').disabled = false;
+      document.querySelectorAll('.research-presets .suggestion-pill').forEach(b => b.disabled = false);
     });
   }
 
-  document.querySelectorAll('.roster-btn').forEach(btn => {
-    btn.addEventListener('click', () => runTeam(btn.dataset.roster));
+  // Wire up the research controls
+  document.getElementById('research-send').addEventListener('click', () => {
+    const input = document.getElementById('research-input');
+    const q = input.value.trim();
+    if (q.length >= 5) {
+      startResearch(null, q);
+      input.value = '';
+    }
+  });
+  document.getElementById('research-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const q = e.target.value.trim();
+      if (q.length >= 5) {
+        startResearch(null, q);
+        e.target.value = '';
+      }
+    }
+  });
+  document.querySelectorAll('.research-presets .suggestion-pill').forEach(btn => {
+    btn.addEventListener('click', () => startResearch(btn.dataset.preset, null));
   });
 
   // ─── Scroll hint visibility ──────────────────────────────────────────────

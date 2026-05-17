@@ -8,7 +8,7 @@ This repo is a working, end-to-end demonstration of all three orchestration patt
 |---|---|---|
 | **1. Single Runner** | Graph workflows | Three parallel data fetches converge in a `JoinNode`, a deterministic Python router branches on temperature, one of three LLM strategy agents generates a structured `RaceStrategy`. ~7s, **1 LLM call**. |
 | **2. Concierge** | Collaborative agents | An LLM coordinator dispatches a *dynamic subset* of 6 specialist subagents in parallel based on what the user asks. Same UI, different inputs, different dispatch patterns. |
-| **3. Team Planner** | Dynamic workflows | A roster of N runners (3 or 10) fans out into N parallel per-runner subworkflows via `@node(parallel_worker=True)`. **8.4× parallel speedup** with 10 runners. |
+| **3. Deep Research** | Dynamic workflows | A decomposer LLM splits an open-ended question into N sub-questions, each researched in parallel, with some recursively spawning their own deeper questions. Tree width AND depth decided by LLMs at runtime. **17 LLM calls in 30s** for a Boston deep-dive. |
 
 ---
 
@@ -35,7 +35,7 @@ Browse to **http://127.0.0.1:8000/**.
 ```bash
 uv run python run_demo.py HOT           # Mode 1 — single runner, HOT scenario
 uv run python run_concierge_demo.py     # Mode 2 — concierge with 4 sample questions
-uv run python run_team_demo.py          # Mode 3 — team with 3-runner and 10-runner rosters
+uv run python run_research_demo.py boston   # Mode 3 — deep research on Boston Marathon
 uv run python smoke_test.py             # Minimal ADK 2.0 Workflow sanity check
 ```
 
@@ -51,7 +51,7 @@ marathonplanner/
 │   │   └── scenarios.py        # Canned HOT/NORMAL/COLD scenario data
 │   ├── strategy_graph.py       # Pillar 1 — graph workflow with parallel fetches + router + agents
 │   ├── concierge.py            # Pillar 2 — coordinator with 6 single_turn specialist subagents
-│   └── team_planner.py         # Pillar 3 — @node(parallel_worker=True) for runtime fan-out
+│   └── deep_research.py        # Pillar 3 — recursive @node(parallel_worker=True) tree
 ├── server.py                   # FastAPI + SSE bridge (no ADK knowledge — just plumbing)
 ├── static/index.html           # Liquid Glass visualization (vanilla HTML/CSS/JS)
 ├── run_demo.py, run_*_demo.py  # Headless CLI runners per mode
@@ -109,7 +109,7 @@ For each pillar, here's the thing 1.x genuinely can't do as cleanly:
 
 **Pillar 2 (Collab):** LLM-driven *dynamic subset* selection with parallel execution. 1.x's `ParallelAgent` is static (always all sub-agents); `transfer_to_agent` is serial. Only 2.0 collab lets the coordinator pick which specialists to invoke per request and run them concurrently.
 
-**Pillar 3 (Dynamic):** Runtime-sized parallel fan-out. 1.x's `ParallelAgent` has a fixed sub-agent list; `LoopAgent` is serial. Only `@node(parallel_worker=True)` lets the parallel topology be determined by data shape at runtime.
+**Pillar 3 (Dynamic):** Runtime-sized *AND* runtime-deep parallel fan-out, including **recursive spawning** of more parallel work from inside a parallel branch. 1.x's `ParallelAgent` has a fixed sub-agent list; `LoopAgent` is serial. Only `@node(parallel_worker=True)` + recursive `ctx.run_node` from inside a worker lets the parallel topology be determined by data and by LLM judgment at runtime.
 
 See [docs/ADK_1X_REWRITE_ANALYSIS.md](docs/ADK_1X_REWRITE_ANALYSIS.md) for the full side-by-side comparison.
 
@@ -123,8 +123,8 @@ See [docs/ADK_1X_REWRITE_ANALYSIS.md](docs/ADK_1X_REWRITE_ANALYSIS.md) for the f
 | 2 | "Should I race today?" | ~13s | 4 | Coordinator + 3 parallel specialists |
 | 2 | "What about fueling?" | ~10s | 2 | Coordinator + 1 specialist (5 sat out) |
 | 2 | "Full review" | ~16s | 7 | Coordinator + 6 specialists in parallel |
-| 3 | Team Alpha (3 runners) | ~10s | 3 | **2.6× parallel speedup** vs serial |
-| 3 | Team Omega (10 runners) | ~9s | 10 | **8.4× parallel speedup** vs serial |
+| 3 | Deep-dive: Boston | ~30s | 17 | 5 sub-questions × ~2 deeper each; tree shape decided at runtime |
+| 3 | Hot weather prep | ~20s | ~10 | Smaller tree; fewer sub-questions warrant deeper investigation |
 
 ---
 

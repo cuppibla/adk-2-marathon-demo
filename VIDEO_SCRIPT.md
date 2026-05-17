@@ -12,7 +12,7 @@
 - [ ] Open in IDE for the code walkthrough:
   - `workflows/strategy_graph.py:187` (Mode 1 — the `edges=[...]` Workflow)
   - `workflows/concierge.py:75` (Mode 2 — coordinator with `sub_agents=[...]`)
-  - `workflows/team_planner.py:84` (Mode 3 — `@node(parallel_worker=True)`)
+  - `workflows/deep_research.py:84` (Mode 3 — `@node(parallel_worker=True)` + recursive `ctx.run_node`)
   - Optional ADK 1.x comparison: `race-condition/agents/planner/agent.py:47`
 - [ ] If the network's flaky, cache one HOT run for the Mode 1 Replay button
 - [ ] Confirm `GOOGLE_API_KEY` is set in `.env`
@@ -209,64 +209,78 @@ If you don't need this — if your routing is deterministic — use a graph work
 
 ---
 
-# § 7 — Mode 3: Team Planner (Pillar 3: Dynamic workflows) (~3:00)
+# § 7 — Mode 3: Deep Research (Pillar 3: Dynamic workflows) (~3:00)
 
-Mode 3. A coach has a roster of N runners. Could be 3 today, could be 30 tomorrow. The team size is unknown at design time.
+Mode 3. Mode 2 was for focused follow-up questions. But what if the runner asks something *open-ended* — "tell me everything I should know about racing Boston"? That's not chat. That's research.
 
-[SHOW: the team panel with two roster buttons]
+Research that needs to break into specific sub-questions, dig into each one, possibly spawn even more questions based on what's found, then synthesize the whole thing into a briefing.
 
-I'll start with Team Alpha — three runners across three different conditions.
+The number of sub-questions isn't predictable. The depth isn't predictable. The shape of the work is decided by the AI at runtime.
 
-[CLICK: Team Alpha]
+[SCROLL to research panel, SHOW the three preset buttons]
 
-Watch all three rows light up at the same time. Three independent per-runner subworkflows fired in parallel. Each one will pick its own strategy agent based on its scenario, run that agent, return a personalized plan.
+I'll click "Deep-dive: Boston Marathon."
 
-[WAIT ~10s]
+[CLICK: Deep-dive Boston preset]
 
-All three complete. Alice — hot Boston — 3:35. Bob — normal Berlin — 3:03. Carol — cold Chicago — 3:12. **Stats card shows 2.6× parallel speedup** — 27 seconds of work in 10 seconds wall time.
+Watch the decomposer fire — that's the purple node at the top. It's deciding what sub-questions to ask.
 
-Here's the moment. Same UI, ten runners.
+[WAIT ~3s]
 
-[CLICK: Team Omega]
+There — five top-level questions appear. Course profile, weather history, pacing, common mistakes, gear. They're all researching in parallel now.
 
-Ten rows. Ten pulses. Ten independent LLM calls running concurrently.
+[WAIT ~10s — narrate during]
 
-[WAIT ~10s]
+Notice the model just decided "this finding needs deeper investigation" — and spawned children questions of its own. Those children are also researching in parallel. Some top-level questions spawned three children, some spawned two. The tree's *shape* is being decided by the LLM at runtime.
 
-Ten plans, ten target finish times. **Total wall time: 9 seconds. Sum if serial: 78 seconds. Parallel speedup: 8.4×.**
+[WAIT for completion, ~15-20s more]
 
-[TRANSITION: switch to IDE, open workflows/team_planner.py around line 84]
+Briefing rendered. Headline: *"Respect the descent to survive the ascent: your Boston race is won or lost by preserving your quadriceps during the first four miles."* Sections breaking down the research themes. Key warnings the runner should not ignore.
 
-Here's the dynamic node.
+[SCROLL to stats card]
+
+Look at the numbers. **17 LLM calls — but only ~30 seconds of wall time.** If we ran serially, this would have been over two minutes. Tree shape: 5 top-level + 12 recursive children, *all decided at runtime by the LLMs themselves.*
+
+[TRANSITION: switch to IDE, open workflows/deep_research.py around line 84]
+
+Here's the recursive piece.
 
 ```python
 @node(parallel_worker=True, rerun_on_resume=True)
-async def plan_for_runner(ctx, node_input):
-    """Per-runner pipeline. ParallelWorker fans this out across the roster."""
-    name = node_input["name"]
-    scenario_key = node_input["scenario"]
-    canned = SCENARIOS[scenario_key]
-    bundled = BundledRunData(...)
-    agent = _pick_strategy_agent(canned["weather"].temp_f)
-    strategy_payload = await ctx.run_node(agent, node_input=bundled.model_dump())
+async def research_topic(ctx, node_input):
+    """One research task — parallel_worker fans this out across the question list.
+    Recursive: a finding may spawn 1-3 deeper questions, which are themselves
+    invoked via ctx.run_node(research_topic, [...]) — fanning out at the next depth.
+    """
+    question = node_input["question"]
+    depth = node_input["depth"]
+    finding = await ctx.run_node(research_agent, node_input=...)
+
+    if finding.needs_deeper and depth < MAX_DEPTH:
+        children = await ctx.run_node(
+            research_topic,
+            node_input=[{"question": dq, "depth": depth + 1, ...} for dq in finding.deeper_questions],
+        )
     ...
 ```
 
-The decorator does the work. `parallel_worker=True` wraps this in ADK's `_ParallelWorker` — when the upstream node emits a list, ParallelWorker spawns one task per item. The number of branches is determined by the list length at runtime.
+The killer line: `await ctx.run_node(research_topic, ...)` — **the node calls itself recursively** with a list of deeper questions, which `parallel_worker` fans out in parallel. The depth and width of the tree are decided by the LLM, not by code.
 
 ---
 
 # § 8 — Pillar 3 narration (~1:00)
 
-What's uniquely 2.0 here.
+This is the moment ADK 2.0 most diverges from 1.x.
 
-`ParallelAgent` in 1.x has a **fixed list of sub-agents at design time.** You can't grow it with the roster.
+`ParallelAgent` in 1.x has a **fixed list of sub-agents at design time.** It can't grow with data, and crucially, it can't recurse — sub-agents can't spawn more parallel work from inside themselves.
 
-`LoopAgent` in 1.x loops a single agent **serially.** No parallelism.
+`LoopAgent` in 1.x loops a single agent **serially.** Sequential, fixed iteration.
 
-Only `@node(parallel_worker=True)` lets the **parallel topology be determined by data at runtime.** Roster of 3? Three parallel branches. Roster of 30? Thirty. Same code.
+In ADK 1.x, this deep research pattern is the boundary where you stop using framework primitives and start writing raw asyncio code outside the workflow. You lose tracing. You lose checkpointing. You lose resumability. The framework can't see what you're doing.
 
-Also: dynamic workflows checkpoint per node. If a runner's plan fails mid-flight, you can resume and skip the runners that already completed. That's free with `parallel_worker` — you don't write the resume logic.
+In ADK 2.0, the same recursive parallel pattern is native. `@node(parallel_worker=True)` plus `ctx.run_node` from inside the worker. The framework tracks every branch, every depth level, every spawn. Resumability works automatically. Tracing works automatically. You keep the infrastructure benefits while the topology adapts to data.
+
+Same theme through all three demos: marathon planning. Same code patterns: schemas, agents, workflows, edges. But each mode demonstrates a fundamentally different orchestration capability — and Mode 3 in particular shows what dynamic workflows make possible that no prior framework primitive could.
 
 [TRANSITION: back to a slide or clean editor]
 
@@ -336,13 +350,15 @@ Plus ~1 minute of buffer for breath, transitions, and LLM call waits. Should lan
 
 1. The "third question — Anything I should worry about overall?" in § 5 (~45s — the first two questions already make the dispatch-pattern point)
 2. The code snippet from § 7 if you've burned time on the demo (~30s — the visual demo is enough)
-3. The handoff in § 10 can shrink to 30s if your collaborator goes immediately after
+3. In § 7, only run the Boston preset — skip the "let me show another preset" beat (~60s)
+4. The handoff in § 10 can shrink to 30s if your collaborator goes immediately after
 
 ## Additions if running short
 
 1. After § 4, briefly show the IDE side-by-side with `race-condition/agents/planner/agent.py` to contrast 1.x's coordinator-with-prompt pattern
-2. In § 7, mention that Team mode supports **resumability** — if a runner fails mid-flight, re-running skips completed runners (the `@node` checkpoint feature)
-3. In § 9, show two contrasting code snippets: 1.x's `ParallelAgent[a, b, c]` vs 2.0's `edges=[...]` for the same pipeline
+2. In § 7, mention that dynamic workflows have **resumability built in** — if any branch fails mid-tree, re-running skips completed branches via per-node checkpointing
+3. In § 7, run a second preset (Heat or Recovery) to show that the tree shape differs per query
+4. In § 9, show two contrasting code snippets: 1.x's `ParallelAgent[a, b, c]` vs 2.0's `edges=[...]` for the same pipeline
 
 ## What to physically have on screen during the talk
 
@@ -350,5 +366,5 @@ Plus ~1 minute of buffer for breath, transitions, and LLM call waits. Should lan
 - **IDE** with these files in tabs:
   - `workflows/strategy_graph.py` open to line 187 (the Workflow definition)
   - `workflows/concierge.py` open to line 75 (the coordinator)
-  - `workflows/team_planner.py` open to line 84 (the parallel_worker node)
+  - `workflows/deep_research.py` open to line 84 (the recursive parallel_worker node)
 - **One slide** with the decision tree from § 9, ready to switch to for the recap

@@ -8,17 +8,61 @@ The project is a three-mode ADK 2.0 education demo. Each phase below maps to a g
 
 ## [Unreleased]
 
-### Coming next — Phase 4: Pillar 3 rebuild
-
-The current Mode 3 (Team Race Day Planner) demonstrates **runtime-sized parallel fan-out** but doesn't show what makes ADK 2.0's dynamic workflows uniquely powerful versus 1.x's `ParallelAgent` — namely **variable depth, recursive structure, and the ability to spawn more work from inside a parallel branch.**
-
-Plan: replace Mode 3 with a **deep research** demo (same marathon theme — "Deep-dive: Boston Marathon"). A decomposer agent breaks the user's question into N sub-research-questions, each one researched in parallel, with some sub-questions recursively spawning their own deeper questions based on findings. A synthesizer aggregates the tree into a comprehensive briefing.
-
-This pattern (Perplexity / ChatGPT Deep Research / Bing) is the canonical Pillar 3 use case in the wild. It's genuinely impossible to express in ADK 1.x without bypassing the framework primitives.
-
-See `docs/BUILD_PLAN.md` (to be updated) for the phased build plan.
+(none)
 
 ---
+
+## Phase 4 — Pillar 3 rebuild as Deep Research
+**Commit:** _next_ · 2026-05-17 · **Tag:** _will tag as `phase4-deep-research`_
+
+### Why
+The original Mode 3 (Team Race Day Planner) demonstrated parallel fan-out over a runtime-sized roster — but that's something ADK 1.x's `ParallelAgent` can also do. The team demo didn't show what makes ADK 2.0's dynamic workflows **uniquely** powerful: variable tree depth, recursive structure, and the ability to spawn more parallel work from inside a parallel branch.
+
+Replaced with a deep research demo — the canonical Pillar 3 use case (Perplexity / ChatGPT Deep Research / Bing). User asks an open-ended question, a decomposer LLM breaks it into N sub-questions, each one is researched in parallel, some recursively spawn their own deeper questions based on findings, and a synthesizer aggregates the whole tree into a briefing.
+
+### Added
+- `workflows/deep_research.py` — three nodes:
+  - `decompose` (function node, runs `decompose_agent`): one LLM call → list of 3-7 sub-questions
+  - `research_topic` (`@node(parallel_worker=True, rerun_on_resume=True)`): per-question pipeline that runs `research_agent`, and if the finding flags `needs_deeper`, recursively calls `ctx.run_node(research_topic, deeper_questions)` to spawn children. `MAX_DEPTH=2` safety cap.
+  - `synthesize` (function node, runs `synthesize_agent`): aggregates the nested research tree into a `DeepResearchBriefing`
+- Three LLM agents (`decompose_agent`, `research_agent`, `synthesize_agent`) — all `single_turn` with structured output schemas
+- New schemas: `DecomposerOutput`, `ResearchFinding` (with `needs_deeper` flag), `DeepResearchBriefing`
+- `/research?preset=boston|heat|recovery` SSE endpoint streaming `workflow_start`, `decompose_complete`, `research_complete`, `synthesize_complete`, `workflow_complete`
+- Frontend research panel: text input + 3 preset buttons, live tree visualization (purple decomposer head + indented research nodes pulsing cyan→mint), briefing card with sections and warnings, stats card with topology metrics
+- `run_research_demo.py` CLI tool for headless testing
+
+### Verified end-to-end
+Boston preset run:
+- Decomposer produced **5 top-level sub-questions** (LLM-decided count)
+- ALL 5 recursively spawned 2-3 **deeper questions = 12 recursive children** (LLM-decided depth)
+- Total: **17 LLM calls in ~30 seconds wall time** (vs ~136s if serial — ~4.5× speedup)
+- Synthesized briefing headline: *"Respect the descent to survive the ascent: your Boston race is won or lost by preserving your quadriceps during the first four miles of aggressive downhill running."*
+- Tree shape decided 100% at runtime by the LLMs
+
+### Removed
+- `workflows/team_planner.py` (old Mode 3 — see why above)
+- `run_team_demo.py`
+- `deep_research_smoke_test.py` (served its Phase 4a purpose — confirmed recursive `ctx.run_node` from `parallel_worker` works)
+- Team panel UI from `static/index.html` (HTML + CSS + JS)
+- `/team` endpoint + `TEAM_ROSTERS` from `server.py`
+- `RunnerSpec`, `RunnerPlan`, `TeamSummary` schemas (no longer used)
+
+### Refactored
+- Renamed `.team-stats-card` CSS class to `.pillar-stats-card` (generic, reused by research)
+- Unscoped `.pillar-tag.purple` rule so it works on both team-banner and chat-banner (legacy and new)
+
+### What's uniquely ADK 2.0 about this (not in 1.x)
+- Tree **width** decided at runtime by decomposer LLM (3-7 sub-questions)
+- Tree **depth** decided at runtime by each researcher LLM (up to MAX_DEPTH=2)
+- Recursive `ctx.run_node(research_topic, list)` from inside a `parallel_worker` — 1.x has no way to spawn more parallel work from inside a parallel branch without bypassing framework primitives
+- Framework retains tracing, checkpointing, resumability across the whole tree
+
+### Notes for the talk
+The Mode 3 narration in `VIDEO_SCRIPT.md` was rewritten to reflect the deep research demo. The 1.x comparison line: *"In 1.x, this is where you stop using framework primitives and start writing raw asyncio — losing tracing, checkpointing, and resumability. In 2.0, the same recursive parallel pattern is native."*
+
+---
+
+## Discoverability fix — chat + team panels findable
 
 ## Discoverability fix — chat + team panels findable
 **Commit:** `627d819` · 2026-05-17
@@ -48,8 +92,8 @@ User feedback: *"I don't see the chat panel and 6 specialist pills."* Mode 1's `
 
 ---
 
-## Phase 2 — Team Race Day Planner (Pillar 3: Dynamic workflows)
-**Commit:** _next_ · 2026-05-17
+## Phase 2 — Team Race Day Planner (Pillar 3 v1 — superseded by Phase 4)
+**Commit:** `83ad356` · 2026-05-17 · _(replaced in Phase 4 — see above)_
 
 ### Added
 - `workflows/team_planner.py` — `team_workflow` using `@node(parallel_worker=True, rerun_on_resume=True)` to fan out one per-runner subworkflow per roster slot. Runtime-sized parallelism via ADK 2.0's `_ParallelWorker` primitive.

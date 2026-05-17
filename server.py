@@ -25,7 +25,6 @@ from google.genai import types as gtypes
 from workflows.concierge import race_concierge
 from workflows.deep_research import deep_research_workflow
 from workflows.strategy_graph import root_agent
-from workflows.team_planner import team_workflow
 
 app = FastAPI(title="Marathon Strategy Demo")
 
@@ -34,24 +33,6 @@ STATIC_DIR = Path(__file__).parent / "static"
 # Module-level state: remembers the most recent run's strategy + data so /chat
 # can reference them. Demo-grade — single user, single context.
 _latest: dict[str, Any] = {"strategy": None, "data": None, "scenario": None}
-
-# Preset rosters for Mode 3 team demos. Names + scenarios are canned so the
-# routing is reproducible on stage.
-TEAM_ROSTERS: dict[str, list[dict]] = {
-    "alpha": [
-        {"name": "Alice",   "scenario": "HOT"},
-        {"name": "Bob",     "scenario": "NORMAL"},
-        {"name": "Carol",   "scenario": "COLD"},
-    ],
-    "omega": [
-        {"name": f"Runner-{i:02d}", "scenario": s}
-        for i, s in enumerate([
-            "HOT", "HOT", "HOT",
-            "NORMAL", "NORMAL", "NORMAL", "NORMAL",
-            "COLD", "COLD", "COLD",
-        ], start=1)
-    ],
-}
 
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -276,71 +257,6 @@ async def chat(question: str = Query(..., min_length=1, max_length=500)):
                 "event": "chat_complete",
                 "data": json.dumps({"ts": round(time.perf_counter() - t0, 3)}),
             }
-
-    return EventSourceResponse(event_gen())
-
-
-@app.get("/team")
-async def team(roster: str = Query(..., pattern="^(alpha|omega)$")):
-    """Run the Pillar 3 team workflow over a preset roster.
-
-    Streams per-runner completion events and a final team summary. The wow
-    is that all runners are planned in parallel — wall time should scale
-    with the slowest runner, not the sum.
-    """
-    chosen = TEAM_ROSTERS[roster]
-    import json as _json
-    roster_msg = gtypes.Content(
-        role="user",
-        parts=[gtypes.Part(text=_json.dumps(chosen))],
-    )
-
-    async def event_gen():
-        t0 = time.perf_counter()
-        yield {
-            "event": "team_start",
-            "data": json.dumps({"roster": chosen, "count": len(chosen), "ts": 0.0}),
-        }
-
-        session_service = InMemorySessionService()
-        runner = Runner(
-            node=team_workflow,
-            app_name="team_app",
-            session_service=session_service,
-            auto_create_session=True,
-        )
-        try:
-            async for event in runner.run_async(
-                user_id="coach",
-                session_id=f"team_session_{int(time.time()*1000)}",
-                new_message=roster_msg,
-            ):
-                out = _event_output(event)
-                ts = round(time.perf_counter() - t0, 3)
-                # Per-runner completion event (output of plan_for_runner)
-                if isinstance(out, dict) and "runner_name" in out:
-                    yield {
-                        "event": "runner_complete",
-                        "data": json.dumps({
-                            "name": out["runner_name"],
-                            "scenario": out["scenario"],
-                            "strategy": out.get("strategy"),
-                            "ts": ts,
-                        }, default=str),
-                    }
-                # Final team summary (output of summarize_team)
-                elif isinstance(out, dict) and "plans" in out and "count" in out:
-                    yield {
-                        "event": "team_complete",
-                        "data": json.dumps({
-                            "summary": out.get("notes", ""),
-                            "count": out.get("count", 0),
-                            "ts": ts,
-                        }),
-                    }
-        except Exception as e:
-            yield {"event": "error", "data": json.dumps({"error": str(e)})}
-            raise
 
     return EventSourceResponse(event_gen())
 
