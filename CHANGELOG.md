@@ -8,7 +8,31 @@ The project is a three-mode ADK 2.0 education demo. Each phase below maps to a g
 
 ## [Unreleased]
 
-(none)
+### Coming next — Phase 4: Pillar 3 rebuild
+
+The current Mode 3 (Team Race Day Planner) demonstrates **runtime-sized parallel fan-out** but doesn't show what makes ADK 2.0's dynamic workflows uniquely powerful versus 1.x's `ParallelAgent` — namely **variable depth, recursive structure, and the ability to spawn more work from inside a parallel branch.**
+
+Plan: replace Mode 3 with a **deep research** demo (same marathon theme — "Deep-dive: Boston Marathon"). A decomposer agent breaks the user's question into N sub-research-questions, each one researched in parallel, with some sub-questions recursively spawning their own deeper questions based on findings. A synthesizer aggregates the tree into a comprehensive briefing.
+
+This pattern (Perplexity / ChatGPT Deep Research / Bing) is the canonical Pillar 3 use case in the wild. It's genuinely impossible to express in ADK 1.x without bypassing the framework primitives.
+
+See `docs/BUILD_PLAN.md` (to be updated) for the phased build plan.
+
+---
+
+## Discoverability fix — chat + team panels findable
+**Commit:** `627d819` · 2026-05-17
+
+### Added
+- Floating **"More below — Concierge (Pillar 2) + Team (Pillar 3) ▾"** pill at the bottom of the viewport when the user is at the top of Mode 1. Glass-styled, bouncing arrow, click to smooth-scroll to the chat panel. Hides automatically once the user scrolls past Mode 1.
+- Auto-scroll to chat panel when Mode 1's `workflow_complete` event fires. The audience sees the natural progression instead of sitting at the stats card wondering what's next.
+
+### Changed
+- Disabled-state opacity on `.chat-section` bumped from 0.55 to 0.78 so the locked-state panel is still clearly visible on the pastel light background.
+- `main` height changed from `100vh` to `calc(100vh - 24px)` to give the scroll hint room to peek above the fold.
+
+### Why
+User feedback: *"I don't see the chat panel and 6 specialist pills."* Mode 1's `height: 100vh` meant the chat and team panels were below the fold on first load, with no indicator they existed. Fix surfaces them without breaking the narrative-by-scroll layout.
 
 ---
 
