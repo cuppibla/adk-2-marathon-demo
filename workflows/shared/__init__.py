@@ -5,6 +5,8 @@ from .schemas import (
     FitnessData,
     RaceStrategy,
     BundledRunData,
+    SpecialistInput,
+    SpecialistResponse,
 )
 from .scenarios import SCENARIOS, scenario, slow_mo
 
@@ -14,6 +16,8 @@ __all__ = [
     "FitnessData",
     "RaceStrategy",
     "BundledRunData",
+    "SpecialistInput",
+    "SpecialistResponse",
     "SCENARIOS",
     "scenario",
     "slow_mo",

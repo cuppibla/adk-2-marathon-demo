@@ -30,8 +30,9 @@
 
   html, body {
     margin: 0;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   body {
@@ -486,6 +487,227 @@
     padding: 40px 24px;
     font-style: italic;
   }
+
+  /* ─── Chat panel (Pillar 2 — Concierge) ────────────────────────────────── */
+  .chat-section {
+    max-width: 1200px;
+    margin: 28px auto 48px;
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .chat-section.disabled {
+    opacity: 0.55;
+    filter: saturate(0.6);
+    pointer-events: none;
+  }
+  .chat-section .panel {
+    padding: 18px 22px;
+  }
+  .chat-banner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .chat-banner h2 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+  .chat-banner .sub {
+    margin: 4px 0 0;
+    color: var(--text-soft);
+    font-size: 12.5px;
+  }
+  .chat-banner .pillar-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 10.5px;
+    font-weight: 700;
+    background: rgba(79, 143, 236, 0.12);
+    color: #1c5cba;
+    border: 1px solid rgba(79, 143, 236, 0.30);
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+  }
+  .chat-status {
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1px solid var(--hairline-2);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-soft);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .chat-status.ready {
+    background: rgba(54, 184, 134, 0.14);
+    color: #1a6e4d;
+    border-color: rgba(54, 184, 134, 0.40);
+  }
+
+  .specialist-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 16px 22px;
+    align-items: center;
+  }
+  .specialist {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: white;
+    border: 1px solid var(--hairline-2);
+    color: var(--text-soft);
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s var(--spring);
+    box-shadow: 0 1px 2px rgba(80, 120, 180, 0.06);
+  }
+  .specialist-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-faint);
+    transition: all 0.3s var(--spring);
+  }
+  .specialist.active {
+    background: rgba(46, 169, 236, 0.18);
+    border-color: var(--active);
+    color: #0a5a8c;
+    box-shadow:
+      0 0 12px rgba(46, 169, 236, 0.30),
+      0 2px 6px rgba(46, 169, 236, 0.15);
+    animation: pulse-pill 1.2s ease-in-out infinite;
+  }
+  .specialist.active .specialist-dot {
+    background: var(--active);
+    box-shadow: 0 0 8px var(--active);
+  }
+  .specialist.complete {
+    background: rgba(54, 184, 134, 0.16);
+    border-color: var(--complete);
+    color: #1a6e4d;
+  }
+  .specialist.complete .specialist-dot { background: var(--complete); }
+  .specialist.concern-serious {
+    border-color: var(--warn);
+    background: rgba(217, 122, 74, 0.14);
+    color: #b8632d;
+  }
+  .specialist.concern-serious .specialist-dot { background: var(--warn); }
+  @keyframes pulse-pill {
+    0%, 100% { box-shadow: 0 0 10px rgba(46, 169, 236, 0.25), 0 2px 6px rgba(46, 169, 236, 0.15); }
+    50%      { box-shadow: 0 0 18px rgba(46, 169, 236, 0.45), 0 4px 10px rgba(46, 169, 236, 0.20); }
+  }
+
+  .chat-suggestions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .suggestion-pill {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid var(--hairline-2);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 12px;
+    color: var(--text-soft);
+    cursor: pointer;
+    transition: all 0.2s var(--ease);
+  }
+  .suggestion-pill:hover:not(:disabled) {
+    background: white;
+    color: var(--text);
+    border-color: var(--accent);
+  }
+  .suggestion-pill:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .chat-history {
+    min-height: 80px;
+    max-height: 380px;
+    overflow-y: auto;
+    padding: 16px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .chat-history .empty {
+    text-align: center;
+    color: var(--text-faint);
+    font-style: italic;
+    font-size: 12px;
+    padding: 14px 0;
+  }
+  .chat-bubble {
+    max-width: 82%;
+    padding: 11px 15px;
+    border-radius: 16px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .chat-bubble.user {
+    align-self: flex-end;
+    background: rgba(79, 143, 236, 0.18);
+    color: var(--text);
+    border-bottom-right-radius: 4px;
+  }
+  .chat-bubble.assistant {
+    align-self: flex-start;
+    background: white;
+    color: var(--text);
+    border: 1px solid var(--hairline-2);
+    border-bottom-left-radius: 4px;
+  }
+  .chat-bubble.assistant .specialists-tag {
+    display: block;
+    font-size: 10px;
+    color: var(--text-faint);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+  }
+
+  .chat-input-row {
+    display: flex;
+    gap: 10px;
+    padding: 12px 16px;
+    align-items: center;
+  }
+  .chat-input-row input {
+    flex: 1;
+    background: white;
+    border: 1px solid var(--hairline-2);
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-family: inherit;
+    font-size: 13px;
+    color: var(--text);
+    transition: all 0.2s var(--ease);
+  }
+  .chat-input-row input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(79, 143, 236, 0.15);
+  }
+  .chat-input-row input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 </style>
 </head>
 <body>
@@ -641,6 +863,47 @@
     <div id="stats-output"></div>
   </div>
 </main>
+
+<section class="chat-section disabled" id="chat-section">
+  <div class="panel glass chat-banner">
+    <div>
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <h2>Race Day Concierge</h2>
+        <span class="pillar-tag">Pillar 2 · Collaborative Agents</span>
+      </div>
+      <p class="sub">Ask follow-up questions. The coordinator picks which specialists to invoke in parallel based on what you ask.</p>
+    </div>
+    <div class="chat-status" id="chat-status">Run Mode 1 first to unlock</div>
+  </div>
+
+  <div class="panel glass specialist-row" id="specialist-row">
+    <div class="specialist" data-name="medical_specialist"><span class="specialist-dot"></span>Medical</div>
+    <div class="specialist" data-name="weather_specialist"><span class="specialist-dot"></span>Weather</div>
+    <div class="specialist" data-name="pacing_specialist"><span class="specialist-dot"></span>Pacing</div>
+    <div class="specialist" data-name="gear_specialist"><span class="specialist-dot"></span>Gear</div>
+    <div class="specialist" data-name="nutrition_specialist"><span class="specialist-dot"></span>Nutrition</div>
+    <div class="specialist" data-name="mental_specialist"><span class="specialist-dot"></span>Mental</div>
+  </div>
+
+  <div class="panel glass" style="padding: 14px 22px;">
+    <div class="chat-suggestions" id="chat-suggestions">
+      <button class="suggestion-pill" data-q="Should I race today?" disabled>Should I race today?</button>
+      <button class="suggestion-pill" data-q="My left knee is twinging at mile 18" disabled>Knee pain mid-race</button>
+      <button class="suggestion-pill" data-q="What about my fueling plan?" disabled>About fueling</button>
+      <button class="suggestion-pill" data-q="It's raining now, should I change my plan?" disabled>It's raining</button>
+      <button class="suggestion-pill" data-q="Anything I should worry about overall?" disabled>Full review</button>
+    </div>
+  </div>
+
+  <div class="panel glass chat-history" id="chat-history">
+    <div class="empty">Pick a suggested question or type your own below.</div>
+  </div>
+
+  <div class="panel glass chat-input-row">
+    <input type="text" id="chat-input" placeholder="Ask the concierge about your race day strategy..." disabled />
+    <button id="chat-send" class="action-btn" disabled>Ask →</button>
+  </div>
+</section>
 
 <script>
   // ─── Graph dependency model ───────────────────────────────────────────────
@@ -886,6 +1149,7 @@
       activeStream = null;
       runBtn.disabled = false;
       updateReplayBtn();
+      unlockChat();
     });
 
     stream.addEventListener('error', () => {
@@ -952,6 +1216,128 @@
     btn.disabled = !cachedRuns[selectedScenario];
   }
 
+  // ─── Pillar 2 — Concierge chat ────────────────────────────────────────────
+  let chatBusy = false;
+  let chatUnlocked = false;
+
+  const SPECIALIST_LABEL = {
+    medical_specialist:   'Medical',
+    weather_specialist:   'Weather',
+    pacing_specialist:    'Pacing',
+    gear_specialist:      'Gear',
+    nutrition_specialist: 'Nutrition',
+    mental_specialist:    'Mental',
+  };
+
+  function unlockChat() {
+    if (chatUnlocked) return;
+    chatUnlocked = true;
+    document.getElementById('chat-section').classList.remove('disabled');
+    document.getElementById('chat-input').disabled = false;
+    document.getElementById('chat-send').disabled = false;
+    document.querySelectorAll('.suggestion-pill').forEach(b => b.disabled = false);
+    const status = document.getElementById('chat-status');
+    status.textContent = 'Ready';
+    status.classList.add('ready');
+  }
+
+  function resetSpecialists() {
+    document.querySelectorAll('#specialist-row .specialist').forEach(el => {
+      el.classList.remove('active', 'complete', 'concern-serious', 'concern-moderate', 'concern-minor');
+    });
+  }
+
+  function setSpecialistState(name, state, concern) {
+    const el = document.querySelector(`#specialist-row .specialist[data-name="${name}"]`);
+    if (!el) return;
+    if (state === 'active') {
+      el.classList.remove('complete');
+      el.classList.add('active');
+    } else if (state === 'complete') {
+      el.classList.remove('active');
+      el.classList.add('complete');
+      if (concern === 'serious') el.classList.add('concern-serious');
+    }
+  }
+
+  function addChatBubble(role, text, dispatchedSpecialists) {
+    const history = document.getElementById('chat-history');
+    const empty = history.querySelector('.empty');
+    if (empty) empty.remove();
+    const bubble = document.createElement('div');
+    bubble.className = `chat-bubble ${role}`;
+    if (role === 'assistant' && dispatchedSpecialists && dispatchedSpecialists.length) {
+      const tag = document.createElement('span');
+      tag.className = 'specialists-tag';
+      const labels = dispatchedSpecialists.map(n => SPECIALIST_LABEL[n] || n);
+      tag.textContent = `Concierge · ${labels.length} specialist${labels.length > 1 ? 's' : ''} in parallel: ${labels.join(', ')}`;
+      bubble.appendChild(tag);
+    }
+    const body = document.createElement('div');
+    body.textContent = text;
+    bubble.appendChild(body);
+    history.appendChild(bubble);
+    history.scrollTop = history.scrollHeight;
+    return bubble;
+  }
+
+  function sendChatQuestion(question) {
+    if (chatBusy || !chatUnlocked || !question.trim()) return;
+    chatBusy = true;
+    resetSpecialists();
+    addChatBubble('user', question);
+
+    const input = document.getElementById('chat-input');
+    const send = document.getElementById('chat-send');
+    input.disabled = true;
+    send.disabled = true;
+    input.value = '';
+
+    const dispatched = [];
+    const responses = {};
+    let synthesized = null;
+
+    const url = `/chat?question=${encodeURIComponent(question)}`;
+    const stream = new EventSource(url);
+
+    stream.addEventListener('chat_start', () => { /* nothing visual yet */ });
+
+    stream.addEventListener('dispatched', (e) => {
+      const data = JSON.parse(e.data);
+      if (!dispatched.includes(data.specialist)) dispatched.push(data.specialist);
+      setSpecialistState(data.specialist, 'active');
+    });
+
+    stream.addEventListener('specialist_done', (e) => {
+      const data = JSON.parse(e.data);
+      responses[data.specialist] = data.response;
+      setSpecialistState(data.specialist, 'complete', data.response.concern_level);
+    });
+
+    stream.addEventListener('synthesized', (e) => {
+      const data = JSON.parse(e.data);
+      synthesized = data.text;
+    });
+
+    stream.addEventListener('chat_complete', () => {
+      if (synthesized) addChatBubble('assistant', synthesized, dispatched);
+      stream.close();
+      chatBusy = false;
+      input.disabled = false;
+      send.disabled = false;
+      input.focus();
+    });
+
+    stream.addEventListener('error', (e) => {
+      console.error('chat SSE error', e);
+      addChatBubble('assistant', 'Sorry — something went wrong with the concierge.', []);
+      stream.close();
+      chatBusy = false;
+      input.disabled = false;
+      send.disabled = false;
+    });
+  }
+
   // ─── Wire up ──────────────────────────────────────────────────────────────
   document.querySelectorAll('.pill-btn[data-scenario]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -966,6 +1352,20 @@
   });
   document.getElementById('run').addEventListener('click', runWorkflow);
   document.getElementById('replay').addEventListener('click', replayWorkflow);
+
+  document.getElementById('chat-send').addEventListener('click', () => {
+    const input = document.getElementById('chat-input');
+    sendChatQuestion(input.value);
+  });
+  document.getElementById('chat-input').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendChatQuestion(e.target.value);
+    }
+  });
+  document.querySelectorAll('.suggestion-pill').forEach(btn => {
+    btn.addEventListener('click', () => sendChatQuestion(btn.dataset.q));
+  });
 
   resetGraph();
 </script>
