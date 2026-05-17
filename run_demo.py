@@ -7,7 +7,7 @@ import time
 from google.adk import Runner
 from google.adk.sessions import InMemorySessionService
 
-from marathon import root_agent
+from workflows.strategy_graph import root_agent
 
 
 async def run_scenario(scenario: str) -> None:

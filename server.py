@@ -13,7 +13,7 @@ from sse_starlette.sse import EventSourceResponse
 from google.adk import Runner
 from google.adk.sessions import InMemorySessionService
 
-from marathon import root_agent
+from workflows.strategy_graph import root_agent
 
 app = FastAPI(title="Marathon Strategy Demo")
 
