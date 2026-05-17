@@ -8,7 +8,19 @@ The project is a three-mode ADK 2.0 education demo. Each phase below maps to a g
 
 ## [Unreleased]
 
-(none — Phase 2 just shipped)
+(none)
+
+---
+
+## Phase 3 — Documentation polish
+**Commit:** _next_ · 2026-05-17
+
+### Changed
+- `VIDEO_SCRIPT.md` rewritten end-to-end for the three-mode structure. Old script covered only Pillar 1 (~20 min on graph workflows alone). New script (~20 min) walks through all three modes with section-by-section prose, stage directions, code references with file paths and line numbers, and per-section pacing budgets. Includes cut and add lists for runtime flex.
+- `README.md` (was empty) — proper repo overview: 3-mode summary, quickstart with uv, file structure, decision tree, "what's uniquely 2.0" per pillar, verified runtime numbers from real LLM runs.
+
+### Decided not to add
+- Mode switcher / tab bar navigation. The sequential layout (Mode 1 graph → chat panel → team panel) mirrors the video script's narrative arc, so audiences see the story by scrolling. A tab switcher would be right for a product but is over-engineering for a teaching demo.
 
 ---
 
