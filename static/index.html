@@ -218,7 +218,48 @@
     grid-template-columns: 1.1fr 1fr;
     gap: 14px;
     padding: 76px 12px 12px;
-    height: 100vh;
+    height: calc(100vh - 24px);
+  }
+  /* Scroll affordance — peeks the next section above the fold */
+  .scroll-hint {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    border: 1px solid var(--hairline-2);
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-soft);
+    box-shadow:
+      0 1px 3px rgba(60, 95, 135, 0.10),
+      0 8px 20px -6px rgba(60, 95, 135, 0.22);
+    cursor: pointer;
+    z-index: 9;
+    transition: all 0.3s var(--spring);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .scroll-hint:hover {
+    transform: translateX(-50%) translateY(-2px);
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .scroll-hint.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+    pointer-events: none;
+  }
+  .scroll-hint .arrow {
+    display: inline-block;
+    animation: scroll-bounce 1.8s ease-in-out infinite;
+  }
+  @keyframes scroll-bounce {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(3px); }
   }
   .graph-panel {
     display: flex;
@@ -498,8 +539,8 @@
     gap: 16px;
   }
   .chat-section.disabled {
-    opacity: 0.55;
-    filter: saturate(0.6);
+    opacity: 0.78;
+    filter: saturate(0.75);
     pointer-events: none;
   }
   .chat-section .panel {
@@ -1038,6 +1079,11 @@
   </div>
 </main>
 
+<button class="scroll-hint" id="scroll-hint" onclick="document.getElementById('chat-section').scrollIntoView({behavior:'smooth', block:'start'})">
+  More below — Concierge (Pillar 2) + Team (Pillar 3)
+  <span class="arrow">▾</span>
+</button>
+
 <section class="chat-section disabled" id="chat-section">
   <div class="panel glass chat-banner">
     <div>
@@ -1348,6 +1394,11 @@
       runBtn.disabled = false;
       updateReplayBtn();
       unlockChat();
+      // Auto-scroll to chat panel once Mode 1 completes — makes the
+      // progression obvious instead of requiring the user to scroll.
+      setTimeout(() => {
+        document.getElementById('chat-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 600);
     });
 
     stream.addEventListener('error', () => {
@@ -1690,6 +1741,17 @@
   document.querySelectorAll('.roster-btn').forEach(btn => {
     btn.addEventListener('click', () => runTeam(btn.dataset.roster));
   });
+
+  // ─── Scroll hint visibility ──────────────────────────────────────────────
+  const scrollHint = document.getElementById('scroll-hint');
+  function updateScrollHint() {
+    // Hide the hint once the user has scrolled past Mode 1
+    const past = window.scrollY > (window.innerHeight * 0.4);
+    if (past) scrollHint.classList.add('hidden');
+    else scrollHint.classList.remove('hidden');
+  }
+  window.addEventListener('scroll', updateScrollHint, { passive: true });
+  updateScrollHint();
 
   resetGraph();
 </script>
