@@ -708,6 +708,180 @@
     opacity: 0.5;
     cursor: not-allowed;
   }
+
+  /* ─── Team panel (Pillar 3 — Dynamic workflows) ────────────────────────── */
+  .team-section {
+    max-width: 1200px;
+    margin: 8px auto 56px;
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .team-banner .pillar-tag.purple {
+    background: rgba(134, 109, 220, 0.14);
+    color: #5a4eb8;
+    border-color: rgba(134, 109, 220, 0.35);
+  }
+
+  .team-pickers {
+    padding: 16px 20px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .team-pickers .label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-right: 6px;
+  }
+  .roster-btn {
+    background: white;
+    color: var(--text);
+    border: 1px solid var(--hairline-2);
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s var(--spring);
+    box-shadow: 0 1px 2px rgba(80, 120, 180, 0.06);
+  }
+  .roster-btn:hover:not(:disabled) {
+    border-color: #6b6dd6;
+    color: #5a4eb8;
+    box-shadow: 0 4px 12px -2px rgba(134, 109, 220, 0.25);
+  }
+  .roster-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .roster-btn .count {
+    display: inline-block;
+    margin-left: 8px;
+    font-weight: 700;
+    background: rgba(134, 109, 220, 0.16);
+    color: #5a4eb8;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+  }
+
+  .team-runners {
+    padding: 18px 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 120px;
+  }
+  .team-runners .empty {
+    text-align: center;
+    color: var(--text-faint);
+    font-style: italic;
+    font-size: 12px;
+    padding: 22px 0;
+  }
+  .runner-row {
+    display: grid;
+    grid-template-columns: 44px 1fr 80px 110px;
+    gap: 14px;
+    align-items: center;
+    padding: 10px 14px;
+    background: white;
+    border: 1px solid var(--hairline-2);
+    border-radius: 14px;
+    transition: all 0.4s var(--spring);
+  }
+  .runner-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(168, 213, 255, 0.6), rgba(200, 232, 218, 0.6));
+    border: 1px solid var(--hairline-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .runner-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+    min-width: 0;
+  }
+  .runner-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .runner-scenario {
+    font-size: 11px;
+    color: var(--text-soft);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+  .runner-status {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .runner-finish {
+    font-size: 14px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-soft);
+    text-align: right;
+  }
+  .runner-row.active {
+    border-color: var(--active);
+    background: rgba(46, 169, 236, 0.07);
+    box-shadow: 0 0 12px rgba(46, 169, 236, 0.20);
+    animation: pulse-row 1.4s ease-in-out infinite;
+  }
+  .runner-row.active .runner-avatar {
+    background: linear-gradient(135deg, rgba(155, 215, 250, 0.7), rgba(195, 230, 250, 0.6));
+    border-color: var(--active);
+  }
+  .runner-row.active .runner-status { color: var(--active); }
+  .runner-row.complete {
+    border-color: var(--complete);
+    background: rgba(54, 184, 134, 0.07);
+  }
+  .runner-row.complete .runner-avatar {
+    background: linear-gradient(135deg, rgba(170, 225, 200, 0.7), rgba(200, 235, 215, 0.6));
+    border-color: var(--complete);
+  }
+  .runner-row.complete .runner-status {
+    color: #1a6e4d;
+  }
+  .runner-row.complete .runner-finish {
+    color: #1a6e4d;
+  }
+  @keyframes pulse-row {
+    0%, 100% { box-shadow: 0 0 10px rgba(46, 169, 236, 0.18); }
+    50%      { box-shadow: 0 0 20px rgba(46, 169, 236, 0.32); }
+  }
+
+  .team-stats-card {
+    padding: 22px 26px;
+    background:
+      linear-gradient(135deg, rgba(134, 109, 220, 0.14), rgba(126, 229, 193, 0.10));
+    border: 1px solid rgba(134, 109, 220, 0.35);
+  }
+  .team-stats-card h2 {
+    color: #5a4eb8;
+    margin-bottom: 14px;
+  }
 </style>
 </head>
 <body>
@@ -903,6 +1077,30 @@
     <input type="text" id="chat-input" placeholder="Ask the concierge about your race day strategy..." disabled />
     <button id="chat-send" class="action-btn" disabled>Ask →</button>
   </div>
+</section>
+
+<section class="team-section" id="team-section">
+  <div class="panel glass chat-banner team-banner">
+    <div>
+      <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <h2>Team Race Day Planner</h2>
+        <span class="pillar-tag purple">Pillar 3 · Dynamic Workflows</span>
+      </div>
+      <p class="sub">Plan strategies for a roster of N runners in parallel. Roster size is data-driven — the topology adapts at runtime.</p>
+    </div>
+  </div>
+
+  <div class="panel glass team-pickers">
+    <span class="label">Roster:</span>
+    <button class="roster-btn" data-roster="alpha">Team Alpha <span class="count">3</span></button>
+    <button class="roster-btn" data-roster="omega">Team Omega <span class="count">10</span></button>
+  </div>
+
+  <div class="panel glass team-runners" id="team-runners">
+    <div class="empty">Pick a roster above to start the parallel fan-out.</div>
+  </div>
+
+  <div id="team-stats"></div>
 </section>
 
 <script>
@@ -1365,6 +1563,132 @@
   });
   document.querySelectorAll('.suggestion-pill').forEach(btn => {
     btn.addEventListener('click', () => sendChatQuestion(btn.dataset.q));
+  });
+
+  // ─── Pillar 3 — Team mode ─────────────────────────────────────────────────
+  let teamBusy = false;
+  const SCENARIO_DESC = {
+    HOT:    'Hot · Boston',
+    NORMAL: 'Normal · Berlin',
+    COLD:   'Cold · Chicago',
+  };
+
+  function initialsOf(name) {
+    const parts = name.replace(/_/g, ' ').replace(/-/g, ' ').split(/\s+/).filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  function renderRunnerRows(roster) {
+    const container = document.getElementById('team-runners');
+    container.innerHTML = '';
+    roster.forEach(r => {
+      const row = document.createElement('div');
+      row.className = 'runner-row active';
+      row.dataset.name = r.name;
+      row.innerHTML = `
+        <div class="runner-avatar">${initialsOf(r.name)}</div>
+        <div class="runner-info">
+          <div class="runner-name">${r.name}</div>
+          <div class="runner-scenario">${SCENARIO_DESC[r.scenario] || r.scenario}</div>
+        </div>
+        <div class="runner-status" data-runner-timer>0.0s</div>
+        <div class="runner-finish" data-runner-finish>…</div>
+      `;
+      container.appendChild(row);
+    });
+  }
+
+  function startRunnerTimers(roster, t0) {
+    // Update all runner timers in lockstep
+    const interval = setInterval(() => {
+      const elapsed = (performance.now() - t0) / 1000;
+      document.querySelectorAll('.runner-row.active [data-runner-timer]').forEach(el => {
+        el.textContent = elapsed.toFixed(1) + 's';
+      });
+      if (!document.querySelector('.runner-row.active')) clearInterval(interval);
+    }, 100);
+    return interval;
+  }
+
+  function markRunnerComplete(name, targetFinish, ts) {
+    const row = document.querySelector(`.runner-row[data-name="${name}"]`);
+    if (!row) return;
+    row.classList.remove('active');
+    row.classList.add('complete');
+    row.querySelector('[data-runner-timer]').textContent = ts.toFixed(1) + 's';
+    row.querySelector('[data-runner-finish]').textContent = targetFinish || '—';
+  }
+
+  function renderTeamStats(totalTime, completionTimes, count) {
+    const slowest = Math.max(...completionTimes);
+    const sumIfSerial = completionTimes.reduce((a, b) => a + b, 0);
+    const speedup = sumIfSerial / Math.max(totalTime, 0.001);
+    document.getElementById('team-stats').innerHTML = `
+      <div class="panel team-stats-card">
+        <h2>Team plan complete</h2>
+        <div class="stats-grid">
+          <div class="stat"><span class="label">Runners planned</span><span class="value">${count}</span></div>
+          <div class="stat"><span class="label">Total wall time</span><span class="value">${totalTime.toFixed(2)}s</span></div>
+          <div class="stat"><span class="label">Slowest runner</span><span class="value">${slowest.toFixed(2)}s</span></div>
+          <div class="stat"><span class="label">Sum if serial</span><span class="value">${sumIfSerial.toFixed(2)}s</span></div>
+          <div class="stat highlight"><span class="label">Parallel speedup</span><span class="value">${speedup.toFixed(1)}×</span></div>
+          <div class="stat"><span class="label">LLM calls</span><span class="value">${count}</span></div>
+        </div>
+      </div>`;
+  }
+
+  function runTeam(rosterId) {
+    if (teamBusy) return;
+    teamBusy = true;
+    document.querySelectorAll('.roster-btn').forEach(b => b.disabled = true);
+    document.getElementById('team-stats').innerHTML = '';
+
+    const completionTimes = [];
+    let totalTime = 0;
+    let runnerCount = 0;
+    let timerInterval = null;
+    let t0 = performance.now();
+
+    const url = `/team?roster=${rosterId}`;
+    const stream = new EventSource(url);
+
+    stream.addEventListener('team_start', (e) => {
+      const data = JSON.parse(e.data);
+      runnerCount = data.count;
+      renderRunnerRows(data.roster);
+      t0 = performance.now();
+      timerInterval = startRunnerTimers(data.roster, t0);
+    });
+
+    stream.addEventListener('runner_complete', (e) => {
+      const data = JSON.parse(e.data);
+      const target = data.strategy && data.strategy.target_finish ? data.strategy.target_finish : '—';
+      completionTimes.push(data.ts);
+      markRunnerComplete(data.name, target, data.ts);
+    });
+
+    stream.addEventListener('team_complete', (e) => {
+      const data = JSON.parse(e.data);
+      totalTime = data.ts;
+      if (timerInterval) clearInterval(timerInterval);
+      renderTeamStats(totalTime, completionTimes, runnerCount);
+      stream.close();
+      teamBusy = false;
+      document.querySelectorAll('.roster-btn').forEach(b => b.disabled = false);
+    });
+
+    stream.addEventListener('error', (e) => {
+      console.error('team SSE error', e);
+      if (timerInterval) clearInterval(timerInterval);
+      stream.close();
+      teamBusy = false;
+      document.querySelectorAll('.roster-btn').forEach(b => b.disabled = false);
+    });
+  }
+
+  document.querySelectorAll('.roster-btn').forEach(btn => {
+    btn.addEventListener('click', () => runTeam(btn.dataset.roster));
   });
 
   resetGraph();

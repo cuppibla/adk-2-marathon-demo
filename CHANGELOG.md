@@ -8,8 +8,42 @@ The project is a three-mode ADK 2.0 education demo. Each phase below maps to a g
 
 ## [Unreleased]
 
-### Phase 2 (in progress) — Team mode (Pillar 3: Dynamic workflows)
-Adds Mode 3 — a roster of N runners (variable size) fanned out in parallel via `@node` and `asyncio.gather`. See `docs/BUILD_PLAN.md`.
+(none — Phase 2 just shipped)
+
+---
+
+## Phase 2 — Team Race Day Planner (Pillar 3: Dynamic workflows)
+**Commit:** _next_ · 2026-05-17
+
+### Added
+- `workflows/team_planner.py` — `team_workflow` using `@node(parallel_worker=True, rerun_on_resume=True)` to fan out one per-runner subworkflow per roster slot. Runtime-sized parallelism via ADK 2.0's `_ParallelWorker` primitive.
+- `RunnerSpec`, `RunnerPlan`, `TeamSummary` schemas in `workflows/shared/schemas.py`.
+- `emit_roster` function node parses the roster from the initial user message (JSON-encoded `Content`).
+- `plan_for_runner` parallel-worker node bundles per-runner data + picks the right strategy agent via temperature + invokes the agent via `ctx.run_node(agent, node_input=...)`. Reuses the strategy agents from `workflows/strategy_graph` — no per-runner duplication.
+- `summarize_team` function node aggregates the parallel results into a `TeamSummary`.
+- `/team?roster=alpha|omega` SSE endpoint on `server.py`. Two preset rosters: alpha (3 runners) and omega (10 runners). Stream events: `team_start`, `runner_complete`, `team_complete`.
+- Team panel UI in `static/index.html`: purple "Pillar 3 · Dynamic Workflows" tag, 2 roster picker buttons, N runner rows with avatar + name + scenario + live timer + finish time. Active rows pulse cyan; complete rows go mint with the personalized target finish time displayed.
+- Team stats card with runner count, total wall time, slowest runner, sum-if-serial, **parallel speedup multiplier**, and LLM call count.
+- `run_team_demo.py` CLI tool for headless testing.
+
+### Verified end-to-end in browser
+
+| Roster | Runners | Total wall time | Sum if serial | **Speedup** |
+|---|---|---|---|---|
+| Team Alpha | 3 (HOT/NORMAL/COLD) | 10.82s | 27.85s | **2.6×** |
+| Team Omega | 10 (mixed) | 9.24s | 78.11s | **8.4×** |
+
+The 10-runner case is the killer pitch: 10 LLM calls completing in the same wall time as ~3, because they're all running in parallel under one `_ParallelWorker`. Each runner gets a personalized RaceStrategy with the right target finish time per their scenario (HOT runners cluster ~3:35, NORMAL ~3:03, COLD ~3:12).
+
+### Why this is uniquely ADK 2.0
+- `ParallelAgent` (1.x): static list of sub-agents at design time. Can't grow with roster size.
+- `LoopAgent` (1.x): serial only.
+- `@node(parallel_worker=True)`: takes a runtime list, spawns one task per item, gathers via `asyncio.wait`. Topology determined by data, not code.
+
+### Notes on what tripped me up
+- `state_delta` on `runner.run_async()` doesn't reach the first node's `ctx.state` (the dict is unpopulated when `emit_roster` runs). Worked around by passing the roster as a JSON-encoded `Content` user message and parsing in `emit_roster`.
+- `ctx.run_node(other_node, ...)` requires the CALLING node to have `rerun_on_resume=True`. The `parallel_worker=True` decorator does NOT auto-set this. Must pass explicitly: `@node(parallel_worker=True, rerun_on_resume=True)`.
+- `@node(parallel_worker=True)` functions must use parameter name `node_input` (not a domain-specific name) because default `parameter_binding='state'` looks up non-special-named params from `ctx.state`.
 
 ---
 
