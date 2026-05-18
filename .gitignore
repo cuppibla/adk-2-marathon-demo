@@ -16,3 +16,4 @@ wheels/
 
 # Claude Code local IDE state (commit only project-shared files like launch.json)
 .claude/settings.local.json
+.claude/worktrees/
