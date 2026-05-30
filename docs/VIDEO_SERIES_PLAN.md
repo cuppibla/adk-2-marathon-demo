@@ -344,42 +344,62 @@ race_concierge = Agent(
 
 *The framework auto-injects a delegation tool per subagent. The coordinator's LLM just calls them — one, two, or all six — depending on the question. That's the entire mechanism."*
 
-## Body — segment 3: the 1.x comparison (5:00 – 6:30)
+## Structured theory (5:00 – 6:45)
 
 ```
-[CUT to examples/adk_1x_equivalent/mode2_collab_equivalent.py, scroll through]
+[BULLET 1 APPEARS]
+
+  1. THE COORDINATOR PICKS A DYNAMIC SUBSET
 ```
 
-*"Here's how this looked in 1.x. There are two options. Both are bad.*
-
-*Option 1: ParallelAgent with all six specialists. Works. But it ALWAYS runs all six. For the fueling question, you'd run all six specialists every time. Five of those calls are wasted."*
+*"The coordinator agent uses its LLM to decide — at runtime, per request — which subagents to invoke. Could be one. Could be three. Could be all six. Determined by the question, not hardcoded in the code."*
 
 ```
-[OVERLAY: "Approach #1: 7 LLM calls per question, always"]
+[BULLET 2 APPEARS]
+
+  2. SELECTED SUBAGENTS RUN IN PARALLEL
 ```
 
-*"Option 2: a coordinator with sub_agents and transfer_to_agent. Better — only relevant specialists run. But transfer_to_agent is SERIAL. One specialist at a time. For a question that needs three specialists, wall time scales linearly."*
+*"When the coordinator picks multiple specialists, it invokes them in a single turn — emitting multiple function calls at once. The framework runs them concurrently.*
+
+*This is the genuinely new feature. In ADK 1.x, ParallelAgent always ran every sub-agent — no dynamic subset. transfer_to_agent ran specialists serially. Neither could do 'LLM picks N, runs them in parallel.'"*
 
 ```
-[OVERLAY: "Approach #2: serial, ~3× wall time"]
+[BULLET 3 APPEARS]
+
+  3. SUBAGENT MODES CONTROL RETURN BEHAVIOR
 ```
 
-*"Neither option gives you 'LLM picks a subset, runs in parallel.' That's the gap 2.0's collab agents fill. It's the only thing that does."*
+*"Each subagent has a mode: single_turn for pure transforms that run in parallel, task for bounded work with clarifying questions, chat for full conversations. single_turn is the mode that supports the parallel execution we just saw."*
 
 ```
-[OVERLAY: big comparison]
-  1.x Approach #1: 7 calls always
-  1.x Approach #2: serial execution
-  2.0:             dynamic subset + parallel
+[CARD: "When to use Pillar 2"]
 ```
 
-## Recap + tease (6:30 – 7:00)
+*"Reach for collaborative agents when the routing decision itself benefits from LLM reasoning — and when you want parallel execution of a dynamic subset of specialists."*
 
-*"Collaborative agents in one sentence: LLM-driven dynamic delegation with parallel execution.*
+```
+[OVERLAY large comparison]
+  For "What about fueling?" (1 specialist needed):
+  1.x ParallelAgent always:  7 LLM calls
+  1.x transfer_to_agent:     3 calls, serial
+  2.0 collab:                2 calls, parallel
+  
+  For "Should I race today?" (3 specialists needed):
+  1.x ParallelAgent always:  7 LLM calls
+  1.x transfer_to_agent:     5 calls, ~30s serial
+  2.0 collab:                4 calls, ~13s parallel
+```
 
-*Use them when the routing decision itself benefits from LLM reasoning. Use the older Sequential or Parallel agents when the routing is deterministic.*
+## Recap + tease (6:45 – 7:15)
 
-*Next episode: dynamic workflows. We're going to ask an open research question and watch the LLM decide — at runtime — how many sub-questions to spawn, and recursively spawn more from inside its own parallel branches. Subscribe."*
+```
+[CAMERA BACK ON ANNIE]
+```
+
+*"Collaborative agents in one sentence: LLM-driven dynamic delegation with parallel execution. Reach for them when an LLM should be picking who handles each request.*
+
+*Next episode: dynamic workflows. We're going to ask an open research question and watch the LLM decide — at runtime — how many sub-questions to spawn, AND recursively spawn more from inside its own parallel branches. Subscribe."*
 
 ---
 
