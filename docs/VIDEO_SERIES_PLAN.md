@@ -10,11 +10,13 @@ Distinct from `VIDEO_SCRIPT.md` (which is a single 20-min conference talk coveri
 
 | Ep | Title | Length | Live demo | Core unique-to-2.0 angle |
 |---|---|---|---|---|
-| 1 | Graph Workflows — One LLM Call Instead of Four | 8 min | Mode 1 (Hot Boston) | Function nodes + agent nodes as peers; deterministic Python router |
-| 2 | Collaborative Agents — Same UI, Different Outcomes | 7 min | Mode 2 (3 questions) | LLM coordinator picks dynamic subset, runs in parallel |
-| 3 | Dynamic Workflows — When the LLM Decides the Shape | 8 min | Mode 3 (Boston preset) | Recursive parallel fan-out with topology decided at runtime |
-| 4 | ADK 1.x vs 2.0 — Three Problems That Needed Solving | 7 min | None (code split-screens) | Concrete before/after for each pillar |
-| | **Total** | **~30 min** | | |
+| 1 | Graph Workflows — One LLM Call Instead of Four | **6 min** | Mode 1 (Hot Boston, ~75s) | Function nodes + agent nodes as peers; deterministic Python router |
+| 2 | Collaborative Agents — Same UI, Different Outcomes | **7 min** | Mode 2 (3 contrasting questions, ~2:30) | LLM coordinator picks dynamic subset, runs in parallel |
+| 3 | Dynamic Workflows — When the LLM Decides the Shape | **6 min** | Mode 3 (Boston preset, ~90s) | Recursive parallel fan-out with topology decided at runtime |
+| 4 | ADK 1.x vs 2.0 — Three Problems That Needed Solving | **6-7 min** | None (code split-screens) | Concrete before/after for each pillar |
+| | **Total** | **~25-26 min** | | |
+
+**Why tighter than the original 30-min plan?** Three episode demos are short live runs (7-30s of actual execution). Stretching them to 3 minutes was padding. Tighter demos + more time spent on concrete real-world examples in the theory bullets = better retention AND better learning.
 
 ---
 
@@ -22,7 +24,7 @@ Distinct from `VIDEO_SCRIPT.md` (which is a single 20-min conference talk coveri
 
 ### Structural formula
 
-Every episode follows the same pedagogical flow. Talking-head presenter intro → demo → explain demo → structured theory → recap.
+Every episode follows the same pedagogical flow. Talking-head presenter intro → demo → explain demo → structured theory with concrete examples → recap.
 
 ```
 0:00 – 0:15   PRESENTER INTRO + LEARNING PROMISE
@@ -31,23 +33,44 @@ Every episode follows the same pedagogical flow. Talking-head presenter intro �
 
 0:15 – 0:25   TITLE CARD: episode #, big bold title
 
-0:25 – 3:30   DEMO with live narration (~3 min)
+0:25 – 1:40   DEMO with live narration (~75s for Eps 1/3, ~2:30 for Ep 2)
               [Show the visual, narrate what's happening, NO theory yet]
+              Demos are SHORT because the actual execution is short.
+              Don't pad — let the visual breathe, then move on.
 
-3:30 – 5:00   EXPLAIN THE DEMO (~1.5 min)
+1:40 – 2:50   EXPLAIN THE DEMO (~1:10)
               [Code reveal — "here's what made that happen"
                Show one snippet, highlight 1-2 key lines]
 
-5:00 – 7:00   STRUCTURED THEORY (~2 min)
+2:50 – 5:15   STRUCTURED THEORY WITH EXAMPLES (~2:25)
               [Numbered bullets, each with its own card on screen]
               "Three things to take away:"
-              "1. <first concept> — including what 1.x couldn't do here"
-              "2. <second concept> — including when to reach for it"
-              "3. <third concept>"
+              
+              "1. <FIRST CONCEPT>"
+                 ◆ Concrete example from the marathon demo
+                 ◆ Concrete example from a different domain
+                    (PR review / customer support / document processing / etc.)
+                 ◆ What ADK 1.x couldn't do here
+              
+              "2. <SECOND CONCEPT>"  [same pattern: marathon + non-marathon + 1.x]
+              "3. <THIRD CONCEPT>"   [same pattern]
+              
               [Closing card: "When to use [Pillar]"]
 
-7:00 – 7:30   RECAP + TEASE next episode
+5:15 – 5:30   "TRY IT YOURSELF" CTA (~15s)
+              "Full repo + companion Colab linked in the description.
+               Clone it, modify it, break it — that's how this clicks."
+
+5:30 – 6:00   RECAP + TEASE next episode
+              [Camera back on Annie]
 ```
+
+### Why the per-bullet examples matter
+
+Abstract bullets ("functions and agents as peers") don't stick.
+Concrete examples make them sticky. Pattern: 1 marathon example + 1-2
+non-marathon examples per bullet, so non-runner viewers have a bridge
+to their own work.
 
 ### Why this structure (vs cold-open)
 
@@ -83,7 +106,7 @@ Every episode follows the same pedagogical flow. Talking-head presenter intro �
 
 ---
 
-# Episode 1 — Graph Workflows: "One LLM Call Instead of Four" (~8 min)
+# Episode 1 — Graph Workflows: "One LLM Call Instead of Four" (~6 min)
 
 ## Presenter intro + promise (0:00 – 0:15)
 
@@ -107,61 +130,43 @@ Every episode follows the same pedagogical flow. Talking-head presenter intro �
 [Hold 2-3 seconds, then smash-cut to the demo]
 ```
 
-## Demo with narration (0:25 – 3:30)
+## Demo with narration (0:25 – 1:40, ~75 seconds)
+
+The actual workflow runs in 7 seconds. Don't pad — let the visual breathe.
 
 ```
 [SHOW: browser at http://127.0.0.1:8000/ — Mode 1 panel visible]
 ```
 
-*"This is the marathon race day strategy planner. A runner asks: plan my race day.*
-*Three things need to happen — fetch the weather, analyze the course profile, pull recent training data — then we pick a pacing strategy."*
+*"Mode 1 of the marathon app. A runner wants a race-day strategy. The graph on the left will fetch weather, course, and fitness data in parallel, bundle them, route based on temperature, and call one LLM to write the plan."*
 
 ```
-[CLICK: Hot · Boston in the header — point at it]
+[CLICK: Hot · Boston in header]
 [CLICK: Run]
+[STAY ON the visualization through the full run]
 ```
 
-*"I clicked Run. Now watch what happens."*
+*"Watch the three nodes. Pulsing in parallel. Each has a live timer. These are plain Python functions — no LLM calls happening here."*
 
 ```
-[STAY ON the visualization for 5+ seconds, narrate in real-time]
+[Pull-fitness completes first → JoinNode flashes after the last fetch → router fires]
 ```
 
-*"Three nodes lit up simultaneously. Cyan. Pulsing. Each has a live timer ticking up — one second, one-and-a-half, two seconds. These are three Python functions running in parallel. Zero LLM calls happening here. Just async functions hitting fake APIs."*
+*"All three done. JoinNode bundled them. Router looked at the temperature — 78 degrees — and picked the hot-weather branch. That router is a four-line `if` statement. Not LLM judgment. Just Python."*
 
 ```
-[Pull-fitness completes first, turns mint]
+[Strategy agent runs ~5s → strategy card renders]
 ```
 
-*"Fitness completed first — that one was the fastest fetch."*
+*"And the strategy. Target: 3:35. Pacing references the runner's actual 7:30 pace, the 78-degree heat, and the 4.5 percent grade at mile 20."*
 
 ```
-[Other two complete; JoinNode flashes]
+[CUT to stats card. OVERLAY: "1 LLM CALL"]
 ```
 
-*"All three done. The JoinNode just fired — that's the diamond shape. It bundled all three outputs into a typed payload. Now the router runs."*
+*"Seven seconds total. **One LLM call.** Fan-out saved 2.5 seconds on the fetch phase. The model only ran for the part that genuinely needed reasoning."*
 
-```
-[Router completes; one strategy node activates]
-```
-
-*"Router fired. It looked at the temperature — 78 degrees — and routed to the hot-weather strategy. The router is a four-line Python function. An `if` statement. No LLM judgment. It cannot be wrong."*
-
-```
-[Strategy agent runs — 5-7 seconds]
-[CUT to strategy output panel]
-```
-
-*"And here's the strategy. Target finish: three thirty-five. Pacing: 'Slow your 7:30 pace to 8:12 per mile to account for 78-degree heat and the 4.5% grade at mile 20.' Notice that — it referenced the actual runner data. The actual weather. The actual course profile. That's the structured output schema doing real work."*
-
-```
-[CUT: scroll to stats card. Hold on it.]
-[OVERLAY: big bold "1 LLM CALL" graphic]
-```
-
-*"Total time: seven seconds. **One LLM call.** Fetch phase ran in 2 seconds in parallel — would have taken 4.5 seconds if we'd done them one at a time."*
-
-## Explain the demo — code reveal (3:30 – 5:00)
+## Explain the demo — code reveal (1:40 – 2:50, ~70 seconds)
 
 ```
 [CUT to IDE — workflows/strategy_graph.py line 187]
@@ -191,14 +196,14 @@ root_agent = Workflow(
 *The fifth row picks one of three branches based on the router's emitted route.*
 *That's it. The framework handles parallelism, scheduling, and the typed handoff."*
 
-## Structured theory (5:00 – 7:00)
+## Structured theory with examples (2:50 – 5:15, ~2:25)
 
 ```
 [SLIDE FORMAT: clean background, large numbered bullets appear one at a time
- Or: split screen — webcam on left, bullet card on right]
+ Each bullet stays on screen while the examples are narrated]
 ```
 
-*"OK. Here's what to take away from graph workflows. Three things."*
+*"Three things to take away from graph workflows."*
 
 ```
 [BULLET 1 APPEARS]
@@ -206,9 +211,15 @@ root_agent = Workflow(
   1. FUNCTIONS AND AGENTS AS PEERS
 ```
 
-*"In ADK 2.0, function nodes — that's plain Python — and Agent nodes — that's LLMs — coexist as equals in the same `edges` array. You don't have to wrap a Python function in an LlmAgent just to call it.*
+*"Function nodes and Agent nodes sit as equals in the same `edges` array. Three concrete examples:*
 
-*ADK 1.x's ParallelAgent only orchestrates agents — so fetching data required wrapping every fetch in an agent, adding three extra LLM calls for work that didn't need any reasoning. That's the 4× cost difference."*
+*In our marathon demo, `fetch_weather` is async Python calling an API. No reasoning needed. It's a function node alongside the strategy agent.*
+
+*In a code-review bot, your `run_tests` and `parse_lint_output` are function nodes. The LLM agent that writes the human PR comment is the only LLM call.*
+
+*In a document processor, your `extract_pdf_text` is a function node. The LLM agent that summarizes is the only LLM call.*
+
+*In ADK 1.x, you'd have to wrap each function in an LlmAgent just to call it. Three useless LLM calls per fetch. That's the 4× cost difference."*
 
 ```
 [BULLET 2 APPEARS]
@@ -216,7 +227,15 @@ root_agent = Workflow(
   2. ROUTING IS DETERMINISTIC
 ```
 
-*"Branching on data is a four-line Python `if` statement. In 1.x, you'd write a coordinator agent with a prose instruction telling the LLM to transfer to the right handler. Mostly worked, occasionally didn't. In 2.0, the routing decision is code. It cannot be wrong."*
+*"Branching on data is a Python `if` statement, not a prompt. Three examples:*
+
+*Our marathon router: `if temp >= 70 return HOT, elif temp <= 40 return COLD, else NORMAL`. Four lines.*
+
+*A customer-support triage app: `if ticket.amount > 10000 return ENTERPRISE, elif ticket.urgency == 'critical' return PRIORITY, else return STANDARD`. Same pattern.*
+
+*A research workflow: `if confidence < 0.7 return NEEDS_DEEPER_RESEARCH, else return READY_TO_SYNTHESIZE`. Same pattern.*
+
+*In 1.x, this lived in a coordinator agent's prompt. Sometimes right, occasionally wrong on edge cases. In 2.0, it's code. It cannot be wrong."*
 
 ```
 [BULLET 3 APPEARS]
@@ -224,13 +243,21 @@ root_agent = Workflow(
   3. TYPED HANDOFF VIA JOINNODE
 ```
 
-*"When parallel branches converge, JoinNode bundles their outputs into a typed Pydantic payload. The next node receives structured data, not untyped session-state strings. The framework validates the shape before the downstream agent ever sees it."*
+*"When parallel branches converge, JoinNode bundles their outputs into a typed Pydantic payload. Examples:*
+
+*Marathon: three fetch outputs become a `BundledRunData` object the strategy agent reads as typed input.*
+
+*Customer support: a parallel fetch of `customer_history + recent_orders + open_tickets` converges into one `CustomerContext` payload for the routing agent.*
+
+*Document processing: parallel calls to extract `text + tables + images` converge into one `ParsedDoc` payload for the summarizer.*
+
+*Compare 1.x's `ParallelAgent`: each sub-agent writes to shared session state by key. The downstream agent reads strings and hopes the keys match. No typed validation."*
 
 ```
 [CARD: "When to use Pillar 1"]
 ```
 
-*"Reach for graph workflows when the structure of the work is known — you can draw the diagram before you write code, and the routing decisions can be expressed as rules instead of LLM judgment."*
+*"Reach for graph workflows when the structure of the work is known — you can draw the diagram before you write code, and routing decisions can be rules instead of LLM judgment."*
 
 ```
 [OVERLAY large comparison graphic]
@@ -239,15 +266,23 @@ root_agent = Workflow(
   ROUTING:           prompt-based  →  Python `if`
 ```
 
-## Recap + tease (7:00 – 7:30)
+## "Try it yourself" CTA (5:15 – 5:30, ~15s)
 
 ```
-[CAMERA BACK ON ANNIE]
+[CAMERA BACK ON ANNIE — quick energy shift]
 ```
 
-*"That's graph workflows. The one thing to remember: when the structure of your workflow is known, draw the diagram, write the edges array, let the framework run it. Eight lines instead of eighty.*
+*"Full repo plus a companion Colab notebook linked in the description. Clone the repo, paste your API key, run it locally — that's how this clicks."*
 
-*Next episode: collaborative agents. We're going to type the same question into a chat box twice and watch a different number of specialists fire each time — in parallel. Subscribe so you don't miss it."*
+## Recap + tease (5:30 – 6:00, ~30s)
+
+```
+[CAMERA ON ANNIE]
+```
+
+*"Graph workflows in one sentence: when the structure of your work is known, draw the diagram in code and let the framework run it.*
+
+*Next episode: collaborative agents. Same chat box, different inputs, different specialists firing in parallel — and one specific feature that's impossible to build in ADK 1.x. Subscribe so you don't miss it."*
 
 ```
 [END CARD: subscribe button + repo link]
@@ -274,51 +309,47 @@ root_agent = Workflow(
   "Same UI, Different Outcomes"
 ```
 
-## Demo with narration (0:25 – 3:30)
+## Demo with narration (0:25 – 2:55, ~2:30)
+
+The whole point of this episode is the dispatch variability — you need at least 2 contrasting questions to make the point. Third question is the "and now all 6" reveal.
 
 ```
 [SHOW: browser scrolled to Mode 2 chat panel — 6 specialist pills visible]
 ```
 
-*"This is Mode 2 — the race concierge. After we generated a strategy, the runner has follow-up questions. Six specialists are available — medical, weather, pacing, gear, nutrition, mental.*
-
-*A coordinator agent decides which ones to call for each question. Watch."*
+*"Mode 2: the concierge. Six specialists — medical, weather, pacing, gear, nutrition, mental. A coordinator agent picks which to invoke per question. Watch three contrasting questions."*
 
 ```
-[CLICK suggestion pill: "What about my fueling plan?"]
-[WAIT ~8s, narrating during the wait]
+[CLICK pill: "About fueling"]
+[WAIT ~10s, narrate]
 ```
 
-*"I just asked about fueling. Watch the specialist row.*
-
-*Only nutrition lights up. The other five stay dim. The coordinator looked at the question, decided only nutrition was relevant, and called just that one."*
+*"Asked about fueling. Only nutrition lit up. The other five stay dim. Coordinator decided only one specialist was relevant."*
 
 ```
-[Response renders in chat history]
+[Response renders]
+[CLICK pill: "Should I race today?"]
+[WAIT ~13s, narrate]
 ```
 
-*"Done. One LLM call to the coordinator, one to the nutrition specialist, one to synthesize. Three calls total — only one specialist actually fired."*
+*"Now: 'should I race today?' Three pills just lit up — medical + weather + pacing. All three at the same time. The coordinator picked three specialists for this question and invoked them in parallel."*
 
 ```
-[CLICK suggestion pill: "Should I race today?"]
-[WAIT ~12s, narrating during the wait]
+[Three responses complete in parallel]
+[CLICK pill: "Full review"]
+[WAIT ~15s, narrate]
 ```
 
-*"Now I'm asking 'should I race today?' — that's a broad question. Watch what happens this time."*
+*"One more: 'anything I should worry about overall?' All six pills light up. Coordinator decided this needs every specialist. Six LLM calls — all running concurrently."*
 
 ```
-[Three pills light cyan simultaneously: medical + weather + pacing]
+[Six responses complete; final synthesized response renders]
+[OVERLAY: tally — 1 then 3 then 6 specialists invoked]
 ```
 
-*"Three specialists lit up at the same time. The coordinator decided medical, weather, and pacing are all relevant for a question about whether to race. And it didn't call them one at a time — it called all three in parallel."*
+*"Same UI. Same code. Three different dispatch patterns: one, three, six. The coordinator's LLM picked each subset based on the question — at runtime."*
 
-```
-[All three complete, response synthesizes]
-```
-
-*"All three responded in parallel. Total wall time for the three: roughly the time of one LLM call. The coordinator synthesized their answers into one cohesive response: 'You should only race if you commit to a slower pace...'*"
-
-## Explain the demo — code reveal (3:30 – 5:00)
+## Explain the demo — code reveal (2:55 – 3:45, ~50s)
 
 ```
 [CUT TO IDE — workflows/concierge.py line 75]
@@ -344,7 +375,7 @@ race_concierge = Agent(
 
 *The framework auto-injects a delegation tool per subagent. The coordinator's LLM just calls them — one, two, or all six — depending on the question. That's the entire mechanism."*
 
-## Structured theory (5:00 – 6:45)
+## Structured theory with examples (3:45 – 6:15, ~2:30)
 
 ```
 [BULLET 1 APPEARS]
@@ -352,7 +383,13 @@ race_concierge = Agent(
   1. THE COORDINATOR PICKS A DYNAMIC SUBSET
 ```
 
-*"The coordinator agent uses its LLM to decide — at runtime, per request — which subagents to invoke. Could be one. Could be three. Could be all six. Determined by the question, not hardcoded in the code."*
+*"The coordinator's LLM decides per-request which subagents to invoke. Three examples:*
+
+*Our marathon concierge: 'fueling?' → 1 specialist. 'should I race?' → 3. 'full review' → 6. Same code path, different subsets.*
+
+*A customer support coordinator: 'billing question' → 1 specialist. 'my account is locked AND I was double-charged' → 2 (security + billing). 'general angry rant' → triage everyone.*
+
+*A code-review bot: a docs-only PR → 1 specialist (style). A new API endpoint → 3 (security + docs + tests). A schema migration → all 5 plus a database reviewer."*
 
 ```
 [BULLET 2 APPEARS]
@@ -360,9 +397,15 @@ race_concierge = Agent(
   2. SELECTED SUBAGENTS RUN IN PARALLEL
 ```
 
-*"When the coordinator picks multiple specialists, it invokes them in a single turn — emitting multiple function calls at once. The framework runs them concurrently.*
+*"Once the coordinator picks the subset, they all fire in one turn — concurrently.*
 
-*This is the genuinely new feature. In ADK 1.x, ParallelAgent always ran every sub-agent — no dynamic subset. transfer_to_agent ran specialists serially. Neither could do 'LLM picks N, runs them in parallel.'"*
+*Marathon: 3 specialists for 'should I race?' run in ~13 seconds total, not 30.*
+
+*Customer support: 'security + billing' run together, response comes back in one LLM call's worth of time.*
+
+*Code review: 5 specialists analyzing a PR finish in parallel — the bot comments roughly when the slowest one completes, not the sum.*
+
+*This is the genuinely new feature. In ADK 1.x, `ParallelAgent` always ran every sub-agent — no dynamic subset. `transfer_to_agent` ran specialists serially. Neither could do 'LLM picks N, runs them in parallel.'"*
 
 ```
 [BULLET 3 APPEARS]
@@ -370,7 +413,15 @@ race_concierge = Agent(
   3. SUBAGENT MODES CONTROL RETURN BEHAVIOR
 ```
 
-*"Each subagent has a mode: single_turn for pure transforms that run in parallel, task for bounded work with clarifying questions, chat for full conversations. single_turn is the mode that supports the parallel execution we just saw."*
+*"Each subagent has a `mode`. Three options:*
+
+*`single_turn` — pure transform, runs in parallel. What our specialists use. What you use when the subagent has one job per request.*
+
+*`task` — bounded work that might ask clarifying questions. Auto-returns when done. Useful for things like 'gather missing info from the user before booking.'*
+
+*`chat` — full conversation with the user. Manual handoff. Useful for long onboarding flows.*
+
+*Only single_turn supports parallel execution. The other two are sequential by design."*
 
 ```
 [CARD: "When to use Pillar 2"]
@@ -380,30 +431,38 @@ race_concierge = Agent(
 
 ```
 [OVERLAY large comparison]
-  For "What about fueling?" (1 specialist needed):
-  1.x ParallelAgent always:  7 LLM calls
-  1.x transfer_to_agent:     3 calls, serial
-  2.0 collab:                2 calls, parallel
+  For 1-specialist question (e.g. "About fueling"):
+    1.x ParallelAgent always:  7 LLM calls
+    1.x transfer_to_agent:     3 calls, serial
+    2.0 collab:                2 calls, parallel
   
-  For "Should I race today?" (3 specialists needed):
-  1.x ParallelAgent always:  7 LLM calls
-  1.x transfer_to_agent:     5 calls, ~30s serial
-  2.0 collab:                4 calls, ~13s parallel
+  For 3-specialist question (e.g. "Should I race today?"):
+    1.x ParallelAgent always:  7 LLM calls
+    1.x transfer_to_agent:     5 calls, ~30s serial
+    2.0 collab:                4 calls, ~13s parallel
 ```
 
-## Recap + tease (6:45 – 7:15)
+## "Try it yourself" CTA (6:15 – 6:30, ~15s)
 
 ```
 [CAMERA BACK ON ANNIE]
 ```
 
-*"Collaborative agents in one sentence: LLM-driven dynamic delegation with parallel execution. Reach for them when an LLM should be picking who handles each request.*
+*"Full repo plus Colab in the description. Try modifying the coordinator's instruction — see how it changes which specialists fire."*
 
-*Next episode: dynamic workflows. We're going to ask an open research question and watch the LLM decide — at runtime — how many sub-questions to spawn, AND recursively spawn more from inside its own parallel branches. Subscribe."*
+## Recap + tease (6:30 – 7:00, ~30s)
+
+```
+[CAMERA ON ANNIE]
+```
+
+*"Collaborative agents: LLM-driven dynamic delegation, parallel execution. Use them when the routing decision benefits from LLM reasoning.*
+
+*Next episode: dynamic workflows. We'll ask an open research question and watch the LLM decide — at runtime — how many sub-questions to spawn AND recursively spawn more. Subscribe."*
 
 ---
 
-# Episode 3 — Dynamic Workflows: "When the LLM Decides the Shape" (~8 min)
+# Episode 3 — Dynamic Workflows: "When the LLM Decides the Shape" (~6 min)
 
 ## Presenter intro + promise (0:00 – 0:15)
 
@@ -422,56 +481,37 @@ race_concierge = Agent(
   "When the LLM Decides the Shape"
 ```
 
-## Demo with narration (0:25 – 4:00)
+## Demo with narration (0:25 – 1:55, ~90 seconds)
+
+The Boston preset takes ~25-30s of actual execution. Don't pad. Let the tree grow on screen.
 
 ```
 [SHOW: browser scrolled to Mode 3 — Deep Research panel]
 ```
 
-*"This is Mode 3 — deep research. Same marathon theme, but a different question — 'tell me everything I should know about racing Boston.'*
-
-*This isn't a chat question. It's not a structured planning question. It's an open research question. You don't know how many sub-questions it'll need. You don't know how deep the research will go. The shape of the work depends entirely on the question."*
+*"Mode 3: deep research. An open question — 'tell me everything I should know about racing Boston.' You don't know how many sub-questions this needs. You don't know how deep the research will go. The shape of the work depends on the question."*
 
 ```
 [CLICK "Deep-dive: Boston Marathon" preset button]
-[WATCH for 25+ seconds, narrate the tree growing]
+[Watch silently for the first 3-4 seconds while decomposer fires]
 ```
 
-*"I just clicked Boston. Watch the tree form."*
+*"Decomposer just fired. Six sub-questions appeared — course profile, weather history, common pitfalls, pacing, gear, hills. All researching in parallel."*
 
 ```
-[Decomposer pulses]
+[After ~10s: some research nodes complete; children appear under some parents]
 ```
 
-*"The decomposer agent just fired. It's reading the question and deciding what sub-questions to research."*
-
-```
-[6-8 sub-question cards appear in cyan]
-```
-
-*"Six sub-questions decomposed. Course profile. Weather history. Common pitfalls. Pacing strategies. Gear norms. Famous hills. All researching in parallel."*
-
-```
-[Some complete, then deeper children appear under them]
-```
-
-*"And — here. See that branch growing? One of the research agents decided its finding warranted a deeper investigation. It just spawned three child questions of its own. Those are now researching in parallel under their parent.*
-
-*The tree is growing in shape determined by what the LLM finds. Not by anything I wrote in code."*
-
-```
-[Wait for synthesis]
-```
-
-*"Synthesizer firing. It's aggregating findings from the whole tree."*
+*"There. Two of those branches just spawned children. The research agents decided their findings warranted deeper investigation — and recursively kicked off new parallel research. The tree is growing in shape determined by the LLM, not by code I wrote."*
 
 ```
 [Final briefing card renders]
+[OVERLAY: "17 LLM calls · 30 seconds wall time · serial would be ~2 minutes"]
 ```
 
-*"And here's the briefing. Headline, sections, key warnings. 17 LLM calls completed in 30 seconds of wall time. If those calls had run serially, that would have been roughly two minutes."*
+*"And there's the briefing. Seventeen LLM calls. Thirty seconds wall time. If those had run serially: about two minutes."*
 
-## Explain the demo — code reveal (4:00 – 5:15)
+## Explain the demo — code reveal (1:55 – 3:00, ~65s)
 
 ```
 [CUT to IDE — workflows/deep_research.py around line 84]
@@ -500,7 +540,7 @@ async def research_subquestion(ctx, node_input):
 
 *The tree shape is the data structure. The code just says 'recurse if needed.'"*
 
-## Structured theory (5:15 – 7:00)
+## Structured theory with examples (3:00 – 5:15, ~2:15)
 
 ```
 [BULLET 1 APPEARS]
@@ -508,7 +548,13 @@ async def research_subquestion(ctx, node_input):
   1. RUNTIME-SHAPED TOPOLOGY
 ```
 
-*"The number of parallel branches AND the depth of the tree are determined at runtime, by data. The LLM decided here that some sub-questions warranted deeper research, others didn't. The code doesn't hardcode the shape — only the per-node behavior."*
+*"Both the width and the depth of the parallel work are decided at runtime by data. Three examples:*
+
+*Marathon deep research: the LLM decomposes the question into N sub-questions (could be 4, could be 8) and some of those spawn deeper children based on findings.*
+
+*Document processing pipeline: user uploads a folder with an unknown number of PDFs. The workflow spawns one parallel branch per PDF — count from the upload, not from the code.*
+
+*GitHub PR triage agent: 'review all open PRs in this repo' — could be 3 PRs, could be 50. The framework fans out per-PR, scaling with the data."*
 
 ```
 [BULLET 2 APPEARS]
@@ -516,7 +562,15 @@ async def research_subquestion(ctx, node_input):
   2. RECURSIVE FAN-OUT INSIDE THE FRAMEWORK
 ```
 
-*"`@node(parallel_worker=True)` plus recursive `ctx.run_node` lets a parallel branch spawn more parallel branches. ADK 1.x literally couldn't do this with framework primitives — you'd either cram everything into one mega-LlmAgent that hallucinates, or drop out to raw asyncio and lose framework tracing, checkpointing, and resumability."*
+*"A parallel branch can spawn MORE parallel branches by calling `ctx.run_node` on itself with a new list. Examples:*
+
+*Marathon research: one finding leads to three deeper questions. Those research in parallel under their parent.*
+
+*Multi-level org chart query: 'summarize each VP's team' → for each VP, fan out per direct report → for each director, fan out per IC.*
+
+*Recursive web crawling: 'crawl this page' → discover N links → fan out to crawl each → some discover more links → continue until depth limit.*
+
+*In ADK 1.x, you literally cannot do this with framework primitives. You'd either cram it into one mega-LlmAgent (quality fails) or drop OUT of the framework to raw asyncio and lose tracing, checkpointing, and resumability."*
 
 ```
 [BULLET 3 APPEARS]
@@ -524,7 +578,15 @@ async def research_subquestion(ctx, node_input):
   3. FRAMEWORK BENEFITS STAY INTACT
 ```
 
-*"Because the recursion is inside the framework, you keep everything — per-node event tracing, automatic checkpointing, resumable execution. If research task 7 of 11 fails, you can retry just that one. With raw asyncio, you'd restart all 11."*
+*"Because the recursion is inside the framework, every per-node feature works:*
+
+*Per-node event tracing — every research call shows up in your OpenTelemetry traces.*
+
+*Automatic checkpointing — if research task 7 of 11 fails, you retry just that one. The framework knows which are done.*
+
+*Resumability — kill the process mid-research, restart, framework skips completed branches.*
+
+*In the raw-asyncio version of this, you'd write all of that yourself."*
 
 ```
 [CARD: "When to use Pillar 3"]
@@ -541,19 +603,27 @@ async def research_subquestion(ctx, node_input):
   2.0 dynamic:         native, recursive, all framework benefits
 ```
 
-## Recap + tease (7:00 – 7:30)
+## "Try it yourself" CTA (5:15 – 5:30, ~15s)
 
 ```
 [CAMERA BACK ON ANNIE]
 ```
 
+*"Full repo and Colab in the description. Try changing the decomposer's instruction — see how the tree shape changes."*
+
+## Recap + tease (5:30 – 6:00, ~30s)
+
+```
+[CAMERA ON ANNIE]
+```
+
 *"Dynamic workflows: runtime-shaped, recursive parallel fan-out, with all framework benefits intact. Use them when the topology depends on data the code doesn't have.*
 
-*Last episode: ADK 1.x versus 2.0 — three problems, three side-by-side comparisons. The one episode that pulls everything together. Subscribe."*
+*Last episode: ADK 1.x versus 2.0 — three problems, three side-by-side comparisons. The episode that pulls everything together. Subscribe."*
 
 ---
 
-# Episode 4 — ADK 1.x vs 2.0: "Three Problems That Needed Solving" (~7 min)
+# Episode 4 — ADK 1.x vs 2.0: "Three Problems That Needed Solving" (~6-7 min)
 
 This is the synthesis episode. It IS the decision tree — but framed as before/after instead of "here's a flowchart."
 
@@ -664,7 +734,7 @@ This is the synthesis episode. It IS the decision tree — but framed as before/
 
 *"That's Pillar 3. Dynamic workflows. Use them when the topology depends on data."*
 
-## Closer (6:00 – 7:00)
+## Closer + try-it-yourself CTA (6:00 – 6:45, ~45s)
 
 ```
 [CUT TO: clean slide with three pillar logos side by side]
@@ -677,11 +747,17 @@ This is the synthesis episode. It IS the decision tree — but framed as before/
 *Collaborative agents: LLM-driven delegation.*
 *Dynamic workflows: runtime topology.*
 
-*You can mix them. Production apps usually do. A graph workflow can contain a collab coordinator. A dynamic worker can invoke a graph workflow per item.*
+*You can mix them. Production apps usually do — a graph workflow can contain a collab coordinator; a dynamic worker can invoke a graph workflow per item.*
 
-*If you've used ADK 1.x, you know which of these problems made you write the most painful code. That's the pillar you should reach for first.*
+*If you've used ADK 1.x, you know which of these problems made you write the most painful code. That's the pillar you should reach for first."*
 
-*The full demo, all the docs, the 1.x reference snippets — link in the description. Subscribe for the tutorial series that'll teach you to build this from scratch."*
+```
+[CAMERA BACK ON ANNIE]
+```
+
+*"Full repo with all three pillars, the 1.x reference snippets we compared, and companion Colabs — all linked in the description. Clone it, try it, break it.*
+
+*Subscribe for the tutorial series next, where we build each pillar from scratch."*
 
 ```
 [END CARD: repo link + "Tutorial series coming soon"]
@@ -717,15 +793,17 @@ Slower build but each episode gets more time to find its audience before the nex
 
 ## Per-episode production cost
 
-| Episode | Recording | Editing | Total |
-|---|---|---|---|
-| Ep 1 | 1.5 hr | 4 hr | ~5.5 hr |
-| Ep 2 | 1 hr | 3.5 hr | ~4.5 hr |
-| Ep 3 | 1.5 hr | 4.5 hr | ~6 hr |
-| Ep 4 | 1 hr | 5 hr (more graphic overlays) | ~6 hr |
-| **Total** | **~5 hr** | **~17 hr** | **~22 hours** |
+(Revised lower now that demos are tighter.)
 
-About **3 focused days** of production work for the full series.
+| Episode | Length | Recording | Editing | Total |
+|---|---|---|---|---|
+| Ep 1 | ~6 min | 1 hr | 3 hr | ~4 hr |
+| Ep 2 | ~7 min | 1 hr | 3.5 hr | ~4.5 hr |
+| Ep 3 | ~6 min | 1 hr | 3 hr | ~4 hr |
+| Ep 4 | ~6-7 min | 0.5 hr | 4 hr (more graphic overlays, no live demo) | ~4.5 hr |
+| **Total** | **~25-26 min** | **~3.5 hr** | **~13.5 hr** | **~17 hours** |
+
+About **2-2.5 focused days** of production work for the full series. (Down from the ~22 hours estimate in the longer version — tighter demos = less footage to edit.)
 
 ## What's NOT in this plan (intentional)
 
