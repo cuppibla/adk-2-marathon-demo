@@ -8,7 +8,19 @@ The project is a three-mode ADK 2.0 education demo. Each phase below maps to a g
 
 ## [Unreleased]
 
-(none)
+### Phase 5 (branch: `phase-5-1x-comparison`) — ADK 1.x reference snippets
+
+Adds hand-written ADK 1.x equivalents for each of the three modes, intended
+for the Ep 4 "ADK 1.x vs 2.0" comparison video and as a migration reference.
+
+- `examples/adk_1x_equivalent/README.md` — explains what these are and warns they're not runnable in this 2.0 project
+- `examples/adk_1x_equivalent/mode1_graph_equivalent.py` (~80 lines of 1.x code) — Mode 1 built with `SequentialAgent + ParallelAgent + LlmAgent` wrappers. Highlights: 3 useless LLM calls to fetch data, routing in prompt, untyped session-state handoff.
+- `examples/adk_1x_equivalent/mode2_collab_equivalent.py` (~140 lines, two approaches) — both 1.x ways to do collab: ParallelAgent always-all (wasteful), or coordinator with `transfer_to_agent` (serial). Highlights neither does dynamic-subset + parallel.
+- `examples/adk_1x_equivalent/mode3_dynamic_equivalent.py` (~150 lines, two approaches) — mega-agent (quality fails) or raw `asyncio.gather` outside the framework (loses tracing/checkpointing). Highlights why `@node(parallel_worker=True)` + recursive `ctx.run_node` is genuinely new.
+
+Each file ends with a `# COMPARISON NOTES:` block listing verifiable numbers (LLM calls per request, lines of code, unique weaknesses) so the video's claims are provable by code inspection.
+
+Not yet merged to main — pending user review of authenticity.
 
 ---
 
