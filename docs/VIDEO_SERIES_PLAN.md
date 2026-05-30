@@ -75,9 +75,9 @@ Every episode follows the same opening pattern. This is the difference between *
 
 ## Hook line (0:10 – 0:25)
 
-*"Three Python functions. One LLM call. Seven seconds.*
-*This same workflow in ADK 1.x would have been four LLM calls and fifteen seconds.*
-*Let me show you what changed."*
+*"Three Python functions running in parallel. One LLM call. Seven seconds total.*
+
+*By the end of this video, you'll know how to express the same workflow in eight lines of code — and you'll recognize exactly when a graph workflow saves you 4× on LLM costs vs a single agent."*
 
 ## Title card (0:25 – 0:40)
 
@@ -231,9 +231,9 @@ root_agent = Workflow(
 
 ## Hook line (0:10 – 0:25)
 
-*"Same chat box. Same code. Different inputs.*
-*The coordinator is deciding which specialists to invoke — in parallel — based on what was asked.*
-*This is the one thing ADK 2.0's collab agents do that nothing else does."*
+*"Same chat box. Same code. Different inputs cause different specialists to fire — in parallel.*
+
+*By the end of this video, you'll know exactly when to reach for collaborative agents instead of ParallelAgent — and the one feature that makes them impossible to express in ADK 1.x."*
 
 ## Title card (0:25 – 0:40)
 
@@ -368,9 +368,9 @@ race_concierge = Agent(
 
 ## Hook line (0:10 – 0:25)
 
-*"That tree was not in any code I wrote.*
-*The LLM decided the width. The LLM decided the depth. The LLM decided which branches needed to spawn more research.*
-*This is the kind of workflow you literally cannot build with ADK 1.x's primitives. Let me show you why."*
+*"That tree shape was not in any code I wrote — the LLM decided the width, the depth, and which branches spawned more research.*
+
+*In the next eight minutes, you'll learn when dynamic workflows are worth the complexity, when they're overkill, and the one decorator that makes recursive parallel work possible inside the ADK framework."*
 
 ## Title card (0:25 – 0:40)
 
@@ -511,9 +511,9 @@ This is the synthesis episode. It IS the decision tree — but framed as before/
 
 ## Hook line (0:15 – 0:30)
 
-*"This is what ADK looked like a year ago.*
-*This is what it looks like now.*
-*Three problems. Three solutions. Let me show you what changed."*
+*"This is what ADK looked like a year ago. This is what it looks like now.*
+
+*By the end of this video, you'll have a mental decision tree for picking the right ADK 2.0 pillar for any agent problem — and you'll never reach for the wrong one."*
 
 ## Title card (0:30 – 0:45)
 
