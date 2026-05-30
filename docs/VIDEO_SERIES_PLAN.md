@@ -20,18 +20,42 @@ Distinct from `VIDEO_SCRIPT.md` (which is a single 20-min conference talk coveri
 
 ## Universal production specs (apply to all 4 episodes)
 
-### The "cool" structural formula
+### Structural formula
 
-Every episode follows the same opening pattern. This is the difference between *"another tutorial"* and *"this is going to be good."*
+Every episode follows the same pedagogical flow. Talking-head presenter intro → demo → explain demo → structured theory → recap.
 
 ```
-0:00 – 0:10   COLD OPEN: visual payoff with NO narration. Just the magic.
-0:10 – 0:25   HOOK LINE: one sentence that names what they just saw + why it matters
-0:25 – 0:40   TITLE CARD: episode #, big bold title, brand
-0:40 – 4:00   BODY: replay with narration, code reveal, key moments
-4:00 – 6:00   COMPARISON: what 1.x couldn't do (each ep does this differently)
-6:00 – 7:00   RECAP + TEASE next episode
+0:00 – 0:15   PRESENTER INTRO + LEARNING PROMISE
+              [Camera on Annie]
+              "Hi, I'm Annie. By the end of this video, you'll learn [X]."
+
+0:15 – 0:25   TITLE CARD: episode #, big bold title
+
+0:25 – 3:30   DEMO with live narration (~3 min)
+              [Show the visual, narrate what's happening, NO theory yet]
+
+3:30 – 5:00   EXPLAIN THE DEMO (~1.5 min)
+              [Code reveal — "here's what made that happen"
+               Show one snippet, highlight 1-2 key lines]
+
+5:00 – 7:00   STRUCTURED THEORY (~2 min)
+              [Numbered bullets, each with its own card on screen]
+              "Three things to take away:"
+              "1. <first concept> — including what 1.x couldn't do here"
+              "2. <second concept> — including when to reach for it"
+              "3. <third concept>"
+              [Closing card: "When to use [Pillar]"]
+
+7:00 – 7:30   RECAP + TEASE next episode
 ```
+
+### Why this structure (vs cold-open)
+
+- **Personal intro builds trust immediately** — viewers know who's teaching them
+- **Learning promise converts curiosity to commitment** — they know what they'll get if they watch
+- **Demo runs uninterrupted by theory** — visual story is allowed to land
+- **Theory in numbered bullets** — viewers can pause, write notes, skim later
+- **More approachable than cinematic cold-open** — feels like a tutorial, not a music video
 
 ### Production tricks for cool-factor (apply universally)
 
@@ -61,25 +85,16 @@ Every episode follows the same opening pattern. This is the difference between *
 
 # Episode 1 — Graph Workflows: "One LLM Call Instead of Four" (~8 min)
 
-## Cold open (0:00 – 0:10)
+## Presenter intro + promise (0:00 – 0:15)
 
 ```
-[BLACK SCREEN]
-[SOFT WHOOSH SOUND]
-[CUT TO: the Mode 1 graph visualization, frozen on the parallel-pulse moment]
-[3 cyan nodes pulsing in sync, no narration, soft pulse sound effects]
-[HOLD for 5 full seconds — let it breathe]
-[CUT TO: stats card showing "1 LLM call · 2.5s saved by fan-out"]
-[HOLD for 2 seconds]
+[CAMERA ON ANNIE — clean background, brand frame]
+[Friendly energy, eye contact with camera]
 ```
 
-## Hook line (0:10 – 0:25)
+*"Hi, I'm Annie. By the end of this video, you'll learn how ADK 2.0's graph workflows let you express a complete multi-step agent in eight lines of code — and you'll know exactly when this pattern saves you 4× on LLM costs versus a single agent."*
 
-*"Three Python functions running in parallel. One LLM call. Seven seconds total.*
-
-*By the end of this video, you'll know how to express the same workflow in eight lines of code — and you'll recognize exactly when a graph workflow saves you 4× on LLM costs vs a single agent."*
-
-## Title card (0:25 – 0:40)
+## Title card (0:15 – 0:25)
 
 ```
 [FULL SCREEN]
@@ -89,10 +104,10 @@ Every episode follows the same opening pattern. This is the difference between *
   Graph Workflows
   "One LLM Call Instead of Four"
 
-[Hold 3 seconds, then smash-cut to body]
+[Hold 2-3 seconds, then smash-cut to the demo]
 ```
 
-## Body — segment 1: replay the demo (0:40 – 4:00)
+## Demo with narration (0:25 – 3:30)
 
 ```
 [SHOW: browser at http://127.0.0.1:8000/ — Mode 1 panel visible]
@@ -146,7 +161,7 @@ Every episode follows the same opening pattern. This is the difference between *
 
 *"Total time: seven seconds. **One LLM call.** Fetch phase ran in 2 seconds in parallel — would have taken 4.5 seconds if we'd done them one at a time."*
 
-## Body — segment 2: code reveal (4:00 – 5:30)
+## Explain the demo — code reveal (3:30 – 5:00)
 
 ```
 [CUT to IDE — workflows/strategy_graph.py line 187]
@@ -176,40 +191,63 @@ root_agent = Workflow(
 *The fifth row picks one of three branches based on the router's emitted route.*
 *That's it. The framework handles parallelism, scheduling, and the typed handoff."*
 
-## Body — segment 3: the 1.x comparison (5:30 – 6:45)
+## Structured theory (5:00 – 7:00)
 
 ```
-[SPLIT SCREEN]
-[LEFT: examples/adk_1x_equivalent/mode1_graph_equivalent.py — scroll through ~50 lines]
-[RIGHT: workflows/strategy_graph.py edges block — 8 lines, static]
+[SLIDE FORMAT: clean background, large numbered bullets appear one at a time
+ Or: split screen — webcam on left, bullet card on right]
 ```
 
-*"Here's what this would have looked like in ADK 1.x.*
-
-*Same problem. Same fetches. Same strategy output.*
-
-*But — three of those LlmAgent definitions on the left side? Those are the fetches. In 1.x, ParallelAgent only orchestrates agents. So every fetch has to be wrapped in an LlmAgent that calls a tool. That's three LLM calls just to dispatch the fetches.*
-
-*And see the strategist's instruction at the bottom? That 200-token block? That's the routing decision — 'if temperature is above 70, do hot-weather logic.' The LLM has to read state, decide the branch, AND write the strategy. All in one prompt."*
+*"OK. Here's what to take away from graph workflows. Three things."*
 
 ```
-[OVERLAY: large comparison graphics]
+[BULLET 1 APPEARS]
+
+  1. FUNCTIONS AND AGENTS AS PEERS
+```
+
+*"In ADK 2.0, function nodes — that's plain Python — and Agent nodes — that's LLMs — coexist as equals in the same `edges` array. You don't have to wrap a Python function in an LlmAgent just to call it.*
+
+*ADK 1.x's ParallelAgent only orchestrates agents — so fetching data required wrapping every fetch in an agent, adding three extra LLM calls for work that didn't need any reasoning. That's the 4× cost difference."*
+
+```
+[BULLET 2 APPEARS]
+
+  2. ROUTING IS DETERMINISTIC
+```
+
+*"Branching on data is a four-line Python `if` statement. In 1.x, you'd write a coordinator agent with a prose instruction telling the LLM to transfer to the right handler. Mostly worked, occasionally didn't. In 2.0, the routing decision is code. It cannot be wrong."*
+
+```
+[BULLET 3 APPEARS]
+
+  3. TYPED HANDOFF VIA JOINNODE
+```
+
+*"When parallel branches converge, JoinNode bundles their outputs into a typed Pydantic payload. The next node receives structured data, not untyped session-state strings. The framework validates the shape before the downstream agent ever sees it."*
+
+```
+[CARD: "When to use Pillar 1"]
+```
+
+*"Reach for graph workflows when the structure of the work is known — you can draw the diagram before you write code, and the routing decisions can be expressed as rules instead of LLM judgment."*
+
+```
+[OVERLAY large comparison graphic]
   LLM CALLS:         4  →  1
-  LINES OF CODE:     ~80 →  8
-  ROUTING:           prompt-based  →  Python if-statement
+  LINES OF CODE:    ~80  →  8
+  ROUTING:           prompt-based  →  Python `if`
 ```
 
-## Recap + tease (6:45 – 7:30)
+## Recap + tease (7:00 – 7:30)
 
-*"That's graph workflows. Three things to remember:*
+```
+[CAMERA BACK ON ANNIE]
+```
 
-*One — function nodes and agent nodes live as peers in the same edges array. No wrapping pure code in LLM agents.*
+*"That's graph workflows. The one thing to remember: when the structure of your workflow is known, draw the diagram, write the edges array, let the framework run it. Eight lines instead of eighty.*
 
-*Two — routing on data is deterministic Python. Cannot be wrong.*
-
-*Three — JoinNode gives you typed handoff for parallel fan-in. No untyped state-dict shuffling.*
-
-*Next episode: collaborative agents. We're going to type the same question into a chat box twice and watch a different number of specialists fire each time. Subscribe so you don't miss it."*
+*Next episode: collaborative agents. We're going to type the same question into a chat box twice and watch a different number of specialists fire each time — in parallel. Subscribe so you don't miss it."*
 
 ```
 [END CARD: subscribe button + repo link]
@@ -219,23 +257,15 @@ root_agent = Workflow(
 
 # Episode 2 — Collaborative Agents: "Same UI, Different Outcomes" (~7 min)
 
-## Cold open (0:00 – 0:10)
+## Presenter intro + promise (0:00 – 0:15)
 
 ```
-[BLACK]
-[CUT TO: user types "Should I race today?" → three specialist pills light cyan simultaneously]
-[INSTANT JUMP CUT TO: user types "My knee hurts" → ONE specialist pill lights]
-[SPLIT SCREEN side by side, both visible for 3 seconds]
-[NO NARRATION through the cuts]
+[CAMERA ON ANNIE]
 ```
 
-## Hook line (0:10 – 0:25)
+*"Hi, I'm Annie. By the end of this video, you'll learn when to reach for ADK 2.0's collaborative agents instead of the older ParallelAgent — and you'll understand the one specific feature that makes them impossible to build in ADK 1.x."*
 
-*"Same chat box. Same code. Different inputs cause different specialists to fire — in parallel.*
-
-*By the end of this video, you'll know exactly when to reach for collaborative agents instead of ParallelAgent — and the one feature that makes them impossible to express in ADK 1.x."*
-
-## Title card (0:25 – 0:40)
+## Title card (0:15 – 0:25)
 
 ```
   ADK 2.0 — Episode 2
@@ -244,7 +274,7 @@ root_agent = Workflow(
   "Same UI, Different Outcomes"
 ```
 
-## Body — segment 1: demo the dispatch variability (0:40 – 4:00)
+## Demo with narration (0:25 – 3:30)
 
 ```
 [SHOW: browser scrolled to Mode 2 chat panel — 6 specialist pills visible]
@@ -288,7 +318,7 @@ root_agent = Workflow(
 
 *"All three responded in parallel. Total wall time for the three: roughly the time of one LLM call. The coordinator synthesized their answers into one cohesive response: 'You should only race if you commit to a slower pace...'*"
 
-## Body — segment 2: code reveal (4:00 – 5:00)
+## Explain the demo — code reveal (3:30 – 5:00)
 
 ```
 [CUT TO IDE — workflows/concierge.py line 75]
@@ -355,24 +385,15 @@ race_concierge = Agent(
 
 # Episode 3 — Dynamic Workflows: "When the LLM Decides the Shape" (~8 min)
 
-## Cold open (0:00 – 0:10)
+## Presenter intro + promise (0:00 – 0:15)
 
 ```
-[BLACK]
-[CUT TO: the deep research tree growing in time-lapse]
-[Decomposer fires → 6 sub-questions appear → 2 spawn deeper children → all converge]
-[NO NARRATION. Soft sound effects per node]
-[HOLD for 8 seconds]
-[CUT to stats overlay: "17 LLM calls · 30 seconds · tree shape decided at runtime"]
+[CAMERA ON ANNIE]
 ```
 
-## Hook line (0:10 – 0:25)
+*"Hi, I'm Annie. By the end of this video, you'll learn when dynamic workflows are worth the added complexity, when they're overkill, and the one decorator that makes recursive parallel work possible inside the ADK framework without dropping out to raw asyncio."*
 
-*"That tree shape was not in any code I wrote — the LLM decided the width, the depth, and which branches spawned more research.*
-
-*In the next eight minutes, you'll learn when dynamic workflows are worth the complexity, when they're overkill, and the one decorator that makes recursive parallel work possible inside the ADK framework."*
-
-## Title card (0:25 – 0:40)
+## Title card (0:15 – 0:25)
 
 ```
   ADK 2.0 — Episode 3
@@ -381,7 +402,7 @@ race_concierge = Agent(
   "When the LLM Decides the Shape"
 ```
 
-## Body — segment 1: demo the tree growth (0:40 – 4:30)
+## Demo with narration (0:25 – 4:00)
 
 ```
 [SHOW: browser scrolled to Mode 3 — Deep Research panel]
@@ -430,7 +451,7 @@ race_concierge = Agent(
 
 *"And here's the briefing. Headline, sections, key warnings. 17 LLM calls completed in 30 seconds of wall time. If those calls had run serially, that would have been roughly two minutes."*
 
-## Body — segment 2: code reveal (4:30 – 5:30)
+## Explain the demo — code reveal (4:00 – 5:15)
 
 ```
 [CUT to IDE — workflows/deep_research.py around line 84]
@@ -459,38 +480,56 @@ async def research_subquestion(ctx, node_input):
 
 *The tree shape is the data structure. The code just says 'recurse if needed.'"*
 
-## Body — segment 3: the 1.x comparison (5:30 – 7:00)
+## Structured theory (5:15 – 7:00)
 
 ```
-[CUT to examples/adk_1x_equivalent/mode3_dynamic_equivalent.py]
+[BULLET 1 APPEARS]
+
+  1. RUNTIME-SHAPED TOPOLOGY
 ```
 
-*"This is the most damning comparison. In 1.x, you have two options. Both are bad.*
-
-*Option 1: One mega-LlmAgent with a prompt instructing it to decompose, research, recurse, and synthesize all in one shot. In practice — the LLM loses track of what it's done, no real parallelism, no checkpointing. Doesn't work in production."*
+*"The number of parallel branches AND the depth of the tree are determined at runtime, by data. The LLM decided here that some sub-questions warranted deeper research, others didn't. The code doesn't hardcode the shape — only the per-node behavior."*
 
 ```
-[Scroll past the mega-agent definition]
+[BULLET 2 APPEARS]
+
+  2. RECURSIVE FAN-OUT INSIDE THE FRAMEWORK
 ```
 
-*"Option 2: drop OUT of the framework. Use raw asyncio. Stand up your own Runner per agent invocation. Write your own recursion bookkeeping. Write your own tree-flattening logic."*
+*"`@node(parallel_worker=True)` plus recursive `ctx.run_node` lets a parallel branch spawn more parallel branches. ADK 1.x literally couldn't do this with framework primitives — you'd either cram everything into one mega-LlmAgent that hallucinates, or drop out to raw asyncio and lose framework tracing, checkpointing, and resumability."*
 
 ```
-[Scroll through the raw asyncio code — show the manual orchestration]
-[OVERLAY: "Outside the framework → no tracing, no checkpointing, no resumability"]
+[BULLET 3 APPEARS]
+
+  3. FRAMEWORK BENEFITS STAY INTACT
 ```
 
-*"This works. But you've abandoned everything the framework gives you. No event tracing. No checkpointing. If something fails on item 7 of 11, you start over.*
+*"Because the recursion is inside the framework, you keep everything — per-node event tracing, automatic checkpointing, resumable execution. If research task 7 of 11 fails, you can retry just that one. With raw asyncio, you'd restart all 11."*
 
-*ADK 2.0's parallel_worker with recursive ctx.run_node is the FIRST way to express recursive parallel fan-out declaratively WITHIN the framework. That's the genuinely new thing."*
+```
+[CARD: "When to use Pillar 3"]
+```
 
-## Recap + tease (7:00 – 7:45)
+*"Reach for dynamic workflows when the topology depends on data — loops, recursion, runtime-sized fan-out. When the static graph of Pillar 1 isn't expressive enough."*
 
-*"Dynamic workflows: runtime-shaped, recursive parallel fan-out, with all framework benefits intact.*
+```
+[OVERLAY large comparison]
+  Recursive parallel fan-out:
+  
+  1.x mega-agent:      hallucinates, no parallelism
+  1.x raw asyncio:     works but OUTSIDE framework
+  2.0 dynamic:         native, recursive, all framework benefits
+```
 
-*Use them when the structure depends on data the code doesn't have. Loops, recursion, runtime-sized fan-out.*
+## Recap + tease (7:00 – 7:30)
 
-*Last episode: ADK 1.x versus 2.0. Three problems. Three side-by-side comparisons. The one episode that pulls everything together. Subscribe."*
+```
+[CAMERA BACK ON ANNIE]
+```
+
+*"Dynamic workflows: runtime-shaped, recursive parallel fan-out, with all framework benefits intact. Use them when the topology depends on data the code doesn't have.*
+
+*Last episode: ADK 1.x versus 2.0 — three problems, three side-by-side comparisons. The one episode that pulls everything together. Subscribe."*
 
 ---
 
@@ -498,24 +537,15 @@ async def research_subquestion(ctx, node_input):
 
 This is the synthesis episode. It IS the decision tree — but framed as before/after instead of "here's a flowchart."
 
-## Cold open (0:00 – 0:15)
+## Presenter intro + promise (0:00 – 0:15)
 
 ```
-[BLACK]
-[CUT TO: a long, ugly ADK 1.x prompt scrolling on screen — zoom in to make it look overwhelming]
-[Pick one from race-condition's planner agent OR a synthetic one — show the "first do X, then if Y, transfer to Z, else..." prose]
-[HOLD for 4 seconds]
-[SMASH-CUT TO: the 8-line edges=[...] from Mode 1]
-[HOLD for 2 seconds]
+[CAMERA ON ANNIE]
 ```
 
-## Hook line (0:15 – 0:30)
+*"Hi, I'm Annie. By the end of this video, you'll have a complete mental decision tree for picking the right ADK 2.0 pillar for any agent problem — and you'll see exactly what ADK 1.x couldn't do in three side-by-side code comparisons."*
 
-*"This is what ADK looked like a year ago. This is what it looks like now.*
-
-*By the end of this video, you'll have a mental decision tree for picking the right ADK 2.0 pillar for any agent problem — and you'll never reach for the wrong one."*
-
-## Title card (0:30 – 0:45)
+## Title card (0:15 – 0:25)
 
 ```
   ADK 2.0 — Episode 4
