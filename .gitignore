@@ -17,3 +17,7 @@ wheels/
 # Claude Code local IDE state (commit only project-shared files like launch.json)
 .claude/settings.local.json
 .claude/worktrees/
+
+# Episode scripts — kept LOCAL ONLY, never pushed to GitHub.
+# Scripts may contain in-progress wording, personal notes, etc.
+docs/episode_scripts/

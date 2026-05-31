@@ -24,14 +24,21 @@ Distinct from `VIDEO_SCRIPT.md` (which is a single 20-min conference talk coveri
 
 ### Structural formula
 
-Every episode follows the same pedagogical flow. Talking-head presenter intro → demo → explain demo → structured theory with concrete examples → recap.
+Every episode follows the same pedagogical flow. Talking-head presenter intro that PREVIEWS what the video covers → demo → explain demo → structured theory with concrete examples → recap.
 
 ```
-0:00 – 0:15   PRESENTER INTRO + LEARNING PROMISE
+0:00 – 0:30   PRESENTER INTRO + PREVIEW + PROMISE
               [Camera on Annie]
-              "Hi, I'm Annie. By the end of this video, you'll learn [X]."
+              "Hi, I'm Annie."
+              "In this video I'll cover [Pillar name] in four parts:
+                - A live demo of [use case]
+                - Then three concepts to take home:
+                  1. [Concept 1]
+                  2. [Concept 2]
+                  3. [Concept 3]
+              By the end you'll know [specific learning outcome]."
 
-0:15 – 0:25   TITLE CARD: episode #, big bold title
+0:30 – 0:40   TITLE CARD: episode #, big bold title
 
 0:25 – 1:40   DEMO with live narration (~75s for Eps 1/3, ~2:30 for Ep 2)
               [Show the visual, narrate what's happening, NO theory yet]
@@ -108,16 +115,27 @@ to their own work.
 
 # Episode 1 — Graph Workflows: "One LLM Call Instead of Four" (~6 min)
 
-## Presenter intro + promise (0:00 – 0:15)
+## Presenter intro + preview + promise (0:00 – 0:30)
 
 ```
 [CAMERA ON ANNIE — clean background, brand frame]
 [Friendly energy, eye contact with camera]
 ```
 
-*"Hi, I'm Annie. By the end of this video, you'll learn how ADK 2.0's graph workflows let you express a complete multi-step agent in eight lines of code — and you'll know exactly when this pattern saves you 4× on LLM costs versus a single agent."*
+*"Hi, I'm Annie."*
 
-## Title card (0:15 – 0:25)
+*"In this video I'll cover ADK 2.0's graph workflows in four parts:*
+
+*— A live demo of a marathon race-day strategy agent*
+
+*— Then three concepts to take home:*
+*  1. Function nodes and agents as peers*
+*  2. Routing that's deterministic — Python, not prompts*
+*  3. Typed handoff via JoinNode*
+
+*By the end you'll know how to express the same workflow in eight lines of code, and exactly when this pattern saves you 4× on LLM costs."*
+
+## Title card (0:30 – 0:40)
 
 ```
 [FULL SCREEN]
@@ -292,15 +310,26 @@ root_agent = Workflow(
 
 # Episode 2 — Collaborative Agents: "Same UI, Different Outcomes" (~7 min)
 
-## Presenter intro + promise (0:00 – 0:15)
+## Presenter intro + preview + promise (0:00 – 0:30)
 
 ```
 [CAMERA ON ANNIE]
 ```
 
-*"Hi, I'm Annie. By the end of this video, you'll learn when to reach for ADK 2.0's collaborative agents instead of the older ParallelAgent — and you'll understand the one specific feature that makes them impossible to build in ADK 1.x."*
+*"Hi, I'm Annie."*
 
-## Title card (0:15 – 0:25)
+*"In this video I'll cover ADK 2.0's collaborative agents in four parts:*
+
+*— A live demo of a race concierge handling three different question types*
+
+*— Then three concepts to take home:*
+*  1. Coordinators that pick a dynamic subset*
+*  2. Selected subagents that run in parallel*
+*  3. Subagent modes — chat, task, single_turn*
+
+*By the end you'll know when to reach for collaborative agents instead of ParallelAgent, and the one specific feature that makes them impossible to build in ADK 1.x."*
+
+## Title card (0:30 – 0:40)
 
 ```
   ADK 2.0 — Episode 2
@@ -464,15 +493,26 @@ race_concierge = Agent(
 
 # Episode 3 — Dynamic Workflows: "When the LLM Decides the Shape" (~6 min)
 
-## Presenter intro + promise (0:00 – 0:15)
+## Presenter intro + preview + promise (0:00 – 0:30)
 
 ```
 [CAMERA ON ANNIE]
 ```
 
-*"Hi, I'm Annie. By the end of this video, you'll learn when dynamic workflows are worth the added complexity, when they're overkill, and the one decorator that makes recursive parallel work possible inside the ADK framework without dropping out to raw asyncio."*
+*"Hi, I'm Annie."*
 
-## Title card (0:15 – 0:25)
+*"In this video I'll cover ADK 2.0's dynamic workflows in four parts:*
+
+*— A live demo of a deep-research agent decomposing and recursively investigating*
+
+*— Then three concepts to take home:*
+*  1. Runtime-shaped topology*
+*  2. Recursive fan-out inside the framework*
+*  3. Framework benefits that stay intact*
+
+*By the end you'll know when dynamic workflows are worth the added complexity, when they're overkill, and the one decorator that makes recursive parallel work possible inside the ADK framework."*
+
+## Title card (0:30 – 0:40)
 
 ```
   ADK 2.0 — Episode 3
@@ -627,15 +667,25 @@ async def research_subquestion(ctx, node_input):
 
 This is the synthesis episode. It IS the decision tree — but framed as before/after instead of "here's a flowchart."
 
-## Presenter intro + promise (0:00 – 0:15)
+## Presenter intro + preview + promise (0:00 – 0:30)
 
 ```
 [CAMERA ON ANNIE]
 ```
 
-*"Hi, I'm Annie. By the end of this video, you'll have a complete mental decision tree for picking the right ADK 2.0 pillar for any agent problem — and you'll see exactly what ADK 1.x couldn't do in three side-by-side code comparisons."*
+*"Hi, I'm Annie."*
 
-## Title card (0:15 – 0:25)
+*"In this video I'll compare ADK 1.x to 2.0 across three problem patterns:*
+
+*— Problem 1: structured planning with parallel data and deterministic routing → Graph workflows*
+
+*— Problem 2: LLM coordinator picking who handles what, in parallel → Collaborative agents*
+
+*— Problem 3: tree-shaped recursive work where the LLM decides the topology → Dynamic workflows*
+
+*By the end you'll have a complete mental decision tree for picking the right ADK 2.0 pillar — and you'll never reach for the wrong one."*
+
+## Title card (0:30 – 0:40)
 
 ```
   ADK 2.0 — Episode 4
